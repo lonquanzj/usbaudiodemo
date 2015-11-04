@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">USBAudioDemo</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="curr_file">当前文件-></string>
+    <string name="switch_to_play_mode">切换到放音模式</string>
+    <string name="switch_to_rec_mode">切换到录音模式</string>
+    <string name="connect_device">连接设备</string>
+    <string name="mixer">混音界面</string>
+
+</resources>

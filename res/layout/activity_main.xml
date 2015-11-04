@@ -1,0 +1,128 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_dark_light"
+    tools:context="com.ccm.usbaudiodemo.activity.MainActivity" >
+    
+    <LinearLayout
+        android:id="@+id/top_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="30dip"
+        android:background="@color/half_transparent"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/tv_curr_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/curr_file"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_text_sp" />
+    </LinearLayout>
+    
+    
+    <Button 
+        android:id="@+id/btn_connectDev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/playback_seekbar"
+        android:layout_marginBottom="20dp"
+        android:text="@string/connect_device" />
+    
+    <Button 
+        android:id="@+id/btn_mixer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/btn_connectDev"
+        android:layout_alignParentRight="true"
+        android:text="@string/mixer" />
+    
+    <ScrollView 
+        android:id="@+id/scrollview_logtext"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:scrollbars="vertical"
+        android:background="@drawable/border"
+	    android:layout_above="@id/btn_connectDev">
+        
+	    <TextView 
+	        android:id="@+id/tv_log"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="log信息" />
+        
+    </ScrollView>
+    
+    
+    <ListView
+        android:id="@+id/music_listview"
+        android:layout_below="@id/top_layout"
+        android:layout_above="@id/scrollview_logtext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/list_background" />
+    
+    
+    <RelativeLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="64dip"
+        android:layout_alignParentBottom="true" >
+
+       <ImageButton
+           android:id="@+id/btn_record"
+           android:layout_width="wrap_content"
+           android:layout_height="fill_parent"
+           android:layout_centerVertical="true"
+           android:background="@drawable/selector_music_btn"
+           android:src="@drawable/record" />
+       
+       <ImageButton
+           android:id="@+id/btn_stop"
+           android:layout_width="wrap_content"
+           android:layout_height="fill_parent"
+           android:layout_centerVertical="true"
+           android:layout_alignParentRight="true"
+           android:background="@drawable/selector_music_btn"
+           android:src="@drawable/stop" />
+
+        <FrameLayout
+            android:id="@+id/playLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" >
+
+            <ImageButton
+                android:id="@+id/btn_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:background="@drawable/selector_music_btn"
+                android:padding="6.0dip"
+                android:src="@drawable/pause"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/btn_play"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:background="@drawable/selector_music_btn"
+                android:padding="6.0dip"
+                android:src="@drawable/play" />
+        </FrameLayout>
+        
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/playback_seekbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottomLayout"
+        android:max="100"
+        android:maxHeight="2.0dip"
+        android:minHeight="2.0dip"
+        android:progressDrawable="@drawable/playback_seekbar" />
+        
+</RelativeLayout>

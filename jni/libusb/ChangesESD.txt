@@ -1,0 +1,376 @@
+core.c:
+
+add:
+
+
+static int s_libusb_logMethod = 0;
+static char *s_libusb_logFileName = NULL;
+
+void libusb_setLogMethod(int i_methodNr)
+{
+    if (i_methodNr >=0 && i_methodNr <= 2)
+    {
+        s_libusb_logMethod = i_methodNr;
+    }
+}
+
+
+void libusb_setLogFileName(const char* i_logFileName)
+{
+    if (i_logFileName != NULL)
+    {
+        s_libusb_logFileName = (char *) malloc(strlen(i_logFileName) + 1);
+        strcpy(s_libusb_logFileName, i_logFileName);
+    }
+}
+
+
+void logToFile(const char* pre, const char *format, va_list args)
+{
+    if (s_libusb_logMethod == 1 && s_libusb_logFileName != NULL)
+    {
+        FILE *logFile = fopen(s_libusb_logFileName, "a");
+        if (logFile)
+        {
+            fprintf(logFile, "%s", pre);
+            vfprintf(logFile, format, args);
+            fprintf(logFile, "\r\n");
+            fclose(logFile);
+        }
+        else
+        {
+            __android_log_print(ANDROID_LOG_DEBUG, "Main", "couldn't open logfile!");
+        }
+    }
+}
+
+
+in usbi_log_v:
+	case LOG_LEVEL_WARNING:
+		__android_log_print(ANDROID_LOG_WARN, "LIBUSB", "%s", function);
+		__android_log_vprint(ANDROID_LOG_WARN, "  LIBUSB", format, args);
+        logToFile("LIBUSB WARNING: ", format, args);
+		break;
+	case LOG_LEVEL_ERROR:
+		__android_log_print(ANDROID_LOG_ERROR, "LIBUSB", "%s", function);
+		__android_log_vprint(ANDROID_LOG_ERROR, "  LIBUSB", format, args);
+        logToFile("LIBUSB ERROR: ", format, args);
+		break;
+
+------------------
+
+libusb.h:
+
+add:
+
+void libusb_setLogMethod(int i_methodNr);
+void libusb_setLogFileName(const char*i_logFileName);
+
+------------------
+
+sync.c:
+
+libusb_control_transfer:
+ if (bRequest != LIBUSB_REQUEST_GET_DESCRIPTOR)
+    {
+        if ((bmRequestType & LIBUSB_RECIPIENT_ENDPOINT) == 0)
+        {
+            uint16_t interface_number = wIndex & 0xFF;
+            //usbi_err(NULL, "CONTROL: claimed = %x, iface = %x", dev_handle->claimed_interfaces, interface_number);
+            if ((dev_handle->claimed_interfaces & (1 << interface_number)) == 0)
+            {
+                usbi_err(NULL, "CONTROL wasn't claimed! claimed = %x, iface = %x, request = %u", dev_handle->claimed_interfaces, interface_number, bRequest);
+            }
+        }
+    }
+
+
+------------------
+
+linux_usbfs.c:
+
+static const char *find_usbfs_path(void)
+{
+	const char *path = "/dev/bus/usb";
+	const char *ret = NULL;
+
+	if (check_usb_vfs(path)) {
+        usbi_info(NULL, "/dev/bus/usb found!");
+		ret = path;
+	} else {
+		path = "/proc/bus/usb";
+		if (check_usb_vfs(path))
+			ret = path;
+	}
+
+	/* look for /dev/usbdev*.* if the normal places fail */
+	if (ret == NULL) {
+		struct dirent *entry;
+		DIR *dir;
+
+		path = "/dev";
+		dir = opendir(path);
+		if (dir != NULL) {
+			while ((entry = readdir(dir)) != NULL) {
+				if (_is_usbdev_entry(entry, NULL, NULL)) {
+					/* found one; that's enough */
+					ret = path;
+					usbdev_names = 1;
+					break;
+				}
+			}
+			closedir(dir);
+		}
+	}
+
+    // sometimes we don't need usbfs, so if this fails, just do like /dev/bus/usb is found, so libusb tries with sysfs
+    if (ret == NULL)
+    {
+        usbi_info(NULL, "Forcing to /dev/bus/usb!");
+        ret = path;
+    }
+
+	if (ret != NULL)
+		usbi_dbg("found usbfs at %s", ret);
+
+	return ret;
+}
+
+case -EXDEV:
+			usbi_err(TRANSFER_CTX(transfer), "low-level USB error %d", urb_desc->status);
+			lib_desc->status = urb_desc->status;
+
+
+
+------------------
+
+core.c:
+
+int API_EXPORTED libusb_open_existing(libusb_device *dev, libusb_device_handle **handle, int fd)
+{
+	struct libusb_context *ctx = DEVICE_CTX(dev);
+	struct libusb_device_handle *_handle;
+	size_t priv_size = usbi_backend->device_handle_priv_size;
+	int r;
+	usbi_dbg("open %d.%d", dev->bus_number, dev->device_address);
+
+	_handle = malloc(sizeof(*_handle) + priv_size);
+	if (!_handle)
+		return LIBUSB_ERROR_NO_MEM;
+
+	r = usbi_mutex_init(&_handle->lock, NULL);
+	if (r)
+		return LIBUSB_ERROR_OTHER;
+
+	_handle->dev = libusb_ref_device(dev);
+	_handle->claimed_interfaces = 0;
+	memset(&_handle->os_priv, 0, priv_size);
+
+	r = usbi_backend->open_existing(_handle, fd);
+	if (r < 0) {
+		libusb_unref_device(dev);
+        usbi_mutex_destroy(&_handle->lock);
+		free(_handle);
+		return r;
+	}
+
+	usbi_mutex_lock(&ctx->open_devs_lock);
+	list_add(&_handle->list, &ctx->open_devs);
+	usbi_mutex_unlock(&ctx->open_devs_lock);
+	*handle = _handle;
+
+
+	/* At this point, we want to interrupt any existing event handlers so
+	 * that they realise the addition of the new device's poll fd. One
+	 * example when this is desirable is if the user is running a separate
+	 * dedicated libusb events handling thread, which is running with a long
+	 * or infinite timeout. We want to interrupt that iteration of the loop,
+	 * so that it picks up the new fd, and then continues. */
+
+	usbi_fd_notification(ctx);
+
+	return 0;
+}
+
+
+static void do_close_existing(struct libusb_context *ctx,
+			      struct libusb_device_handle *dev_handle, int fd)
+{
+    struct usbi_transfer *itransfer;
+	struct usbi_transfer *tmp;
+
+	libusb_lock_events(ctx);
+
+	/* remove any transfers in flight that are for this device */
+	usbi_mutex_lock(&ctx->flying_transfers_lock);
+
+	/* safe iteration because transfers may be being deleted */
+	list_for_each_entry_safe(itransfer, tmp, &ctx->flying_transfers, list, struct usbi_transfer) {
+		struct libusb_transfer *transfer =
+		        USBI_TRANSFER_TO_LIBUSB_TRANSFER(itransfer);
+
+		if (transfer->dev_handle != dev_handle)
+			continue;
+
+		if (!(itransfer->flags & USBI_TRANSFER_DEVICE_DISAPPEARED)) {
+			usbi_err(ctx, "Device handle closed while transfer was still being processed, but the device is still connected as far as we know");
+
+			if (itransfer->flags & USBI_TRANSFER_CANCELLING)
+				usbi_warn(ctx, "A cancellation for an in-flight transfer hasn't completed but closing the device handle");
+			else
+				usbi_err(ctx, "A cancellation hasn't even been scheduled on the transfer for which the device is closing");
+		}
+
+		/* remove from the list of in-flight transfers and make sure
+		 * we don't accidentally use the device handle in the future
+		 * (or that such accesses will be easily caught and identified as a crash)
+		 */
+		usbi_mutex_lock(&itransfer->lock);
+		list_del(&itransfer->list);
+		transfer->dev_handle = NULL;
+		usbi_mutex_unlock(&itransfer->lock);
+
+		/* it is up to the user to free up the actual transfer struct.  this is
+		 * just making sure that we don't attempt to process the transfer after
+		 * the device handle is invalid
+		 */
+		usbi_dbg("Removed transfer %p from the in-flight list because device handle %p closed",
+			 transfer, dev_handle);
+	}
+	usbi_mutex_unlock(&ctx->flying_transfers_lock);
+
+	libusb_unlock_events(ctx);
+
+	usbi_mutex_lock(&ctx->open_devs_lock);
+	list_del(&dev_handle->list);
+	usbi_mutex_unlock(&ctx->open_devs_lock);
+
+	usbi_backend->close_existing(dev_handle, fd);
+	libusb_unref_device(dev_handle->dev);
+    usbi_mutex_destroy(&dev_handle->lock);
+	free(dev_handle);
+}
+
+
+void API_EXPORTED libusb_close_existing(libusb_device_handle *dev_handle, int fd)
+{
+	struct libusb_context *ctx;
+	unsigned char dummy = 1;
+	ssize_t r;
+
+	if (!dev_handle)
+		return;
+	usbi_dbg("");
+
+	ctx = HANDLE_CTX(dev_handle);
+
+	/* Similarly to libusb_open(), we want to interrupt all event handlers
+	 * at this point. More importantly, we want to perform the actual close of
+	 * the device while holding the event handling lock (preventing any other
+	 * thread from doing event handling) because we will be removing a file
+	 * descriptor from the polling loop. */
+
+	/* record that we are messing with poll fds */
+	usbi_mutex_lock(&ctx->pollfd_modify_lock);
+	ctx->pollfd_modify++;
+	usbi_mutex_unlock(&ctx->pollfd_modify_lock);
+
+	/* write some data on control pipe to interrupt event handlers */
+	r = usbi_write(ctx->ctrl_pipe[1], &dummy, sizeof(dummy));
+	if (r <= 0) {
+		usbi_warn(ctx, "internal signalling write failed, closing anyway");
+		do_close_existing(ctx, dev_handle, fd);
+		usbi_mutex_lock(&ctx->pollfd_modify_lock);
+		ctx->pollfd_modify--;
+		usbi_mutex_unlock(&ctx->pollfd_modify_lock);
+		return;
+	}
+
+	/* take event handling lock */
+	libusb_lock_events(ctx);
+
+	/* read the dummy data */
+	r = usbi_read(ctx->ctrl_pipe[0], &dummy, sizeof(dummy));
+	if (r <= 0)
+		usbi_warn(ctx, "internal signalling read failed, closing anyway");
+
+	/* Close the device */
+	do_close_existing(ctx, dev_handle, fd);
+
+	/* we're done with modifying poll fds */
+	usbi_mutex_lock(&ctx->pollfd_modify_lock);
+	ctx->pollfd_modify--;
+	usbi_mutex_unlock(&ctx->pollfd_modify_lock);
+
+	/* Release event handling lock and wake up event waiters */
+	libusb_unlock_events(ctx);
+}
+
+
+void usbi_log_v(struct libusb_context *ctx, enum usbi_log_level level,
+	const char *function, const char *format, va_list args)
+{
+	//FILE *stream = stdout;
+	//const char *prefix;
+	struct timeval now;
+	static struct timeval first = { 0, 0 };
+
+#ifndef ENABLE_DEBUG_LOGGING
+	USBI_GET_CONTEXT(ctx);
+    if (ctx)
+    {
+	    if (!ctx->debug)
+		    return;
+	    if (level == LOG_LEVEL_WARNING && ctx->debug < 2)
+		    return;
+	    if (level == LOG_LEVEL_INFO && ctx->debug < 3)
+		    return;
+    }
+#endif
+
+	gettimeofday(&now, NULL);
+	if (!first.tv_sec) {
+		first.tv_sec = now.tv_sec;
+		first.tv_usec = now.tv_usec;
+	}
+	if (now.tv_usec < first.tv_usec) {
+		now.tv_sec--;
+		now.tv_usec += 1000000;
+	}
+	now.tv_sec -= first.tv_sec;
+	now.tv_usec -= first.tv_usec;
+
+	switch (level) {
+	case LOG_LEVEL_INFO:
+		__android_log_print(ANDROID_LOG_INFO, "LIBUSB", "%s", function);
+		__android_log_vprint(ANDROID_LOG_INFO, "  LIBUSB", format, args);
+		break;
+	case LOG_LEVEL_WARNING:
+		__android_log_print(ANDROID_LOG_WARN, "LIBUSB", "%s", function);
+		__android_log_vprint(ANDROID_LOG_WARN, "  LIBUSB", format, args);
+		break;
+	case LOG_LEVEL_ERROR:
+		__android_log_print(ANDROID_LOG_ERROR, "LIBUSB", "%s", function);
+		__android_log_vprint(ANDROID_LOG_ERROR, "  LIBUSB", format, args);
+		break;
+	case LOG_LEVEL_DEBUG:
+		/*__android_log_print(ANDROID_LOG_DEBUG, "LIBUSB", function);
+		__android_log_vprint(ANDROID_LOG_DEBUG, "  LIBUSB", format, args);*/
+		break;
+	default:
+		__android_log_print(ANDROID_LOG_INFO, "LIBUSB", "%s", function);
+		__android_log_vprint(ANDROID_LOG_INFO, "  LIBUSB", format, args);
+		break;
+	}
+
+	/*fprintf(stream, "libusb: %d.%06d %s [%s] ",
+		(int)now.tv_sec, (int)now.tv_usec, prefix, function);
+
+	vfprintf(stream, format, args);
+
+	fprintf(stream, "\n");*/
+}
+
+
+
+
