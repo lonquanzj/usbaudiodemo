@@ -332,7 +332,7 @@ void KeyExpansion( byte * expandedKey )
 	uint8_t  *key;
 	uint8_t  a[16];
 	key=a;
-	//ÒÔÏÂÎª¼Ó½âÃÜÃÜÂë£¬¹²16×Ö½Ú¡£¿ÉÒÔÑ¡ÔñÈÎÒâÖµ
+	//ä»¥ä¸‹ä¸ºåŠ è§£å¯†å¯†ç ï¼Œå…±16å­—èŠ‚ã€‚å¯ä»¥é€‰æ‹©ä»»æ„å€¼
 	/*key[0]=0x30;
 	key[1]=0x30;
 	key[2]=0x30;
@@ -350,14 +350,14 @@ void KeyExpansion( byte * expandedKey )
 	key[14]=0x30;
 	key[15]=0x30;*/
 
-	if (g_IsVad)  //ĞéÄâÉù¿¨ÉÏÓÃµÄ£¬²»ÓÃµÄKeyÖµ¡£
+	if (g_IsVad)  //è™šæ‹Ÿå£°å¡ä¸Šç”¨çš„ï¼Œä¸ç”¨çš„Keyå€¼ã€‚
 	{
 		for( i=0; i<16; i++)
 		{
 			key[i] = 0x68 + i * 5;
 		}
 	}
-	else   //ÕæÕıÉù¿¨ÉÏÓÃµÄ¡£
+	else   //çœŸæ­£å£°å¡ä¸Šç”¨çš„ã€‚
 	{
 		for( i=0; i<16; i++)
 		{
@@ -432,7 +432,7 @@ void InvCipher( byte * block, byte * expandedKey )
 	InvSubBytesAndXOR( block, expandedKey, 16 );
 }
 
-void Cipher( byte * block, byte * expandedKey )	   //Íê³ÉÒ»¸ö¿é(16×Ö½Ú£¬128bit)µÄ¼ÓÃÜ
+void Cipher( byte * block, byte * expandedKey )	   //å®Œæˆä¸€ä¸ªå—(16å­—èŠ‚ï¼Œ128bit)çš„åŠ å¯†
 {
 	byte round = ROUNDS-1;
 
@@ -461,14 +461,14 @@ void aesInit( uint8_t * tempbuf )
 	sBox = tempbuf;
 	CalcSBox( sBox );
 
-	expandedKey = block1;  //ÖÁ´Ëblock1ÓÃÀ´´æÖüÃÜÂë±í
+	expandedKey = block1;  //è‡³æ­¤block1ç”¨æ¥å­˜è´®å¯†ç è¡¨
 	KeyExpansion( expandedKey );
 	
-	sBoxInv = block2; // Must be block2. block2ÖÁ´Ë¿ªÊ¼Ö»ÓÃÀ´´æÖüSBOXINV
+	sBoxInv = block2; // Must be block2. block2è‡³æ­¤å¼€å§‹åªç”¨æ¥å­˜è´®SBOXINV
 	CalcSBoxInv( sBox, sBoxInv );
 }	
 
-//¶ÔÒ»¸ö16×Ö½Ú¿é½âÃÜ,²ÎÊıbufferÊÇ½âÃÜÃÜ»º´æ£¬chainBlockÊÇÒª½âÃÜµÄ¿é
+//å¯¹ä¸€ä¸ª16å­—èŠ‚å—è§£å¯†,å‚æ•°bufferæ˜¯è§£å¯†å¯†ç¼“å­˜ï¼ŒchainBlockæ˜¯è¦è§£å¯†çš„å—
 void aesDecrypt(uint8_t * chainBlock )
 {
 	//byte  temp[ BLOCKSIZE ];
@@ -481,7 +481,7 @@ void aesDecrypt(uint8_t * chainBlock )
 	CopyBytes( chainBlock, buffer, BLOCKSIZE );
 }
 
-//¶ÔÒ»¸ö16×Ö½Ú¿éÍê³É¼ÓÃÜ£¬²ÎÊıbufferÊÇ¼ÓÃÜ»º´æ£¬chainBlockÊÇÒª¼ÓÃÜµÄ¿é
+//å¯¹ä¸€ä¸ª16å­—èŠ‚å—å®ŒæˆåŠ å¯†ï¼Œå‚æ•°bufferæ˜¯åŠ å¯†ç¼“å­˜ï¼ŒchainBlockæ˜¯è¦åŠ å¯†çš„å—
 void aesEncrypt(uint8_t * chainBlock )
 {
     uint8_t buffer[16]; 
@@ -492,26 +492,26 @@ void aesEncrypt(uint8_t * chainBlock )
 }
 
 
-//È¡³ö¼ÓÃÜÊı¾İ¡£
+//å–å‡ºåŠ å¯†æ•°æ®ã€‚
 void GetAESData(byte * outbuf, const byte * inbuf/*, bool isVad*/)
 {
 	byte  inTemp[16];
 	byte  initTemp[256];
 	byte     i, MaxD, MinD, nIndex1, nIndex2;
 
-	//ÏÈÈ¡Ô­Öµ
+	//å…ˆå–åŸå€¼
 	for( i=0; i<4; i++)
 	{
 		inTemp[i] = inbuf[i];
 	}
 
-	//µ¹Ğò
+	//å€’åº
 	for( i=0; i<4; i++)
 	{
 		inTemp[i+4] = inbuf[4-i-1];
 	}
 
-	//ÒÔÇ°8¸öµÄÊıÖµ¶Ô8ÇóÄ££¬×öÎªÏÂ±ê
+	//ä»¥å‰8ä¸ªçš„æ•°å€¼å¯¹8æ±‚æ¨¡ï¼Œåšä¸ºä¸‹æ ‡
 	for(i=0; i<8; i++)
 	{
 		byte j = inTemp[i] % 8;
@@ -520,17 +520,17 @@ void GetAESData(byte * outbuf, const byte * inbuf/*, bool isVad*/)
 
 //	g_IsVad = isVad;
 
-	//³õÊ¼»¯¡£
+	//åˆå§‹åŒ–ã€‚
 	aesInit(initTemp);
 
-	//È¡³ö¼ÓÃÜÊı¾İ
+	//å–å‡ºåŠ å¯†æ•°æ®
 	aesEncrypt(inTemp);
 
 	//byte outTemp[16];
 	//AES_Encrypt(inTemp);
 
 
-	//È¡³ö×î´óÖµÓë×îĞ¡Öµ
+	//å–å‡ºæœ€å¤§å€¼ä¸æœ€å°å€¼
 	 MaxD =inTemp[0];
 	 MinD =inTemp[0];
 
@@ -542,7 +542,7 @@ void GetAESData(byte * outbuf, const byte * inbuf/*, bool isVad*/)
 			MinD = inTemp[i];
 	}
 
-	//·µ»ØÖµÖĞ¼äÖµµÄÏÂ±ê
+	//è¿”å›å€¼ä¸­é—´å€¼çš„ä¸‹æ ‡
 	 nIndex1 = MinD % 8;
 	 nIndex2 = 8 + MaxD % 8;
 
@@ -550,8 +550,8 @@ void GetAESData(byte * outbuf, const byte * inbuf/*, bool isVad*/)
 	 ss.Format(_T("Max=%d, Min=%d"),  MinD, MaxD);
 	 AfxMessageBox(ss);*/
 
-	//×é³É·µ»ØÖµ
-	//ÒÔ×îĞ¡ÖµÓë×î´óÖµÌî³ä£¬ÓÉ×î´óÓë×îĞ¡È¡µÃÏÂ±ê£¬·µ»Ø¡£
+	//ç»„æˆè¿”å›å€¼
+	//ä»¥æœ€å°å€¼ä¸æœ€å¤§å€¼å¡«å……ï¼Œç”±æœ€å¤§ä¸æœ€å°å–å¾—ä¸‹æ ‡ï¼Œè¿”å›ã€‚
 	outbuf[0] = MinD * 2 + 1;
 	outbuf[1] = inTemp[nIndex1] + 3;
 	outbuf[2] = inTemp[nIndex2] - 3;
@@ -568,7 +568,7 @@ unsigned long GetTickCount()
     return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
-//»ñÈ¡Ëæ»úµÄËÄ¸öbyte
+//è·å–éšæœºçš„å››ä¸ªbyte
 void GetDataNow(byte * buf)
 {
 	time_t nowt;

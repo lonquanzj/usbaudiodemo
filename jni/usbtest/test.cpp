@@ -1,7 +1,7 @@
 /*
  * test.cpp
  *
- *  Created on: 2015Äê9ÔÂ22ÈÕ
+ *  Created on: 2015å¹´9æœˆ22æ—¥
  *      Author: percy
  */
 
@@ -14,7 +14,7 @@
 
 timeval m_starttime,m_endtime;
 bool globa = true;
-//Ğ´ÈëµİÔöÊı¾İ
+//å†™å…¥é€’å¢æ•°æ®
 int g_data = 0;
 
 
@@ -32,9 +32,9 @@ void  jiangeshijian() {
 
 
 /*
- * Ğ´ÈëµİÔöË«Í¨µÀÊı¾İ
- * output:ĞèÒªĞ´ÈëµÄbuffer
- * i_frameCount Ö¡Êı£¨Ä¬ÈÏÎªË«ÉùµÀ£©
+ * å†™å…¥é€’å¢åŒé€šé“æ•°æ®
+ * output:éœ€è¦å†™å…¥çš„buffer
+ * i_frameCount å¸§æ•°ï¼ˆé»˜è®¤ä¸ºåŒå£°é“ï¼‰
  */
 void writedizeng( void *o_output, int i_frameCount) {
         for (short *s_temp = ( short *)o_output; s_temp < ( short *)o_output + i_frameCount * 2; s_temp += 2)
@@ -60,12 +60,12 @@ void panduandizeng(const void* i_input, int i_frameCount){
 }
 
 void dayinqianjige(const void* i_input){
-	wxLogDebugMain( "%x, %x, %x£¬ %x", *(short*)i_input, *(short*)((int*)i_input + 1), *(short*)((int*)i_input + 2),*(short*)((int*)i_input + 3));
+	wxLogDebugMain( "%x, %x, %xï¼Œ %x", *(short*)i_input, *(short*)((int*)i_input + 1), *(short*)((int*)i_input + 2),*(short*)((int*)i_input + 3));
 }
 
 void printBuffer_Byte(const void* i_input, int size){
 	int i;
-	for(i = 0; i < 16*(size/16); i+=16){//Ö»´òÓ¡16µÄÕûÊı±¶
+	for(i = 0; i < 16*(size/16); i+=16){//åªæ‰“å°16çš„æ•´æ•°å€
 		wxLogDebugMain( "%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x,%x", *((unsigned char*)i_input+i), *((unsigned char*)i_input+i+1), *((unsigned char*)i_input+i+2), *((unsigned char*)i_input+i+3),
 				*((unsigned char*)i_input+i+4), *((unsigned char*)i_input+i+5), *((unsigned char*)i_input+i+6), *((unsigned char*)i_input+i+7),
 				*((unsigned char*)i_input+i+8), *((unsigned char*)i_input+i+9), *((unsigned char*)i_input+i+10), *((unsigned char*)i_input+i+11),
@@ -74,7 +74,7 @@ void printBuffer_Byte(const void* i_input, int size){
 
 	if(size%16){
 	i = size-size%16;
-		//´òÓ¡ºó8Î»
+		//æ‰“å°å8ä½
 	wxLogDebugMain( "%x,%x,%x,%x,%x,%x,%x,%x", *((unsigned char*)i_input+i), *((unsigned char*)i_input+i+1), *((unsigned char*)i_input+i+2), *((unsigned char*)i_input+i+3),
 				*((unsigned char*)i_input+i+4), *((unsigned char*)i_input+i+5), *((unsigned char*)i_input+i+6), *((unsigned char*)i_input+i+7));
 	}

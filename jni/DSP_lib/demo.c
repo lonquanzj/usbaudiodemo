@@ -113,7 +113,7 @@ void setValueByHID(int type, int index,float value, unsigned char *i_data, int l
 			CDynamicaEffect_setParameter(RATIO1_ID, value);
 			break;
 		case 4:
-//			CDynamicaEffect_setParameter(DYNAMIC_ENABLE, value);//’“≤ªµΩDYNAMIC_ENABLE
+//			CDynamicaEffect_setParameter(DYNAMIC_ENABLE, value);//Êâæ‰∏çÂà∞DYNAMIC_ENABLE
 			break;
 		default:
 			break;
@@ -201,18 +201,18 @@ void setValueByHID(int type, int index,float value, unsigned char *i_data, int l
 	*(p + 1) = Get_ISRAM_len();
 	for (i = 0; i < *(p); i++) {
 		*(p + i + 2) = Get_gpr_data(i);
-//		        LOGI("len=%ld", *(p+i));//»°≥ˆµƒ√ø∏ˆ‘™Àÿ
-//		*(p+i) += 5; //»°≥ˆµƒ√ø∏ˆ‘™Àÿº”ŒÂ
+//		        LOGI("len=%ld", *(p+i));//ÂèñÂá∫ÁöÑÊØè‰∏™ÂÖÉÁ¥†
+//		*(p+i) += 5; //ÂèñÂá∫ÁöÑÊØè‰∏™ÂÖÉÁ¥†Âä†‰∫î
 	}
 
 	for (i = 0; i < *(p + 1); i++) {
 		*(p + i + 2 + *(p)) = Get_ISRAM_data(i);
-//		        LOGI("len=%ld", *(p+i));//»°≥ˆµƒ√ø∏ˆ‘™Àÿ
-//		*(p+i) += 5; //»°≥ˆµƒ√ø∏ˆ‘™Àÿº”ŒÂ
+//		        LOGI("len=%ld", *(p+i));//ÂèñÂá∫ÁöÑÊØè‰∏™ÂÖÉÁ¥†
+//		*(p+i) += 5; //ÂèñÂá∫ÁöÑÊØè‰∏™ÂÖÉÁ¥†Âä†‰∫î
 	}
 
 //	for(i=0;i< len;i++){
-//			   *(p+i) = i ;//»°≥ˆµƒ√ø∏ˆ‘™Àÿº”ŒÂ
+//			   *(p+i) = i ;//ÂèñÂá∫ÁöÑÊØè‰∏™ÂÖÉÁ¥†Âä†‰∫î
 //	}
 }
 

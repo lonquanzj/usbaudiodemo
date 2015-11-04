@@ -15,7 +15,7 @@
 
 #define DSPDATA_BUFFERSIZE 64
 
-//Ã¿¸öÑéÖ¤(4byte) ÔÚ Êı¾İÓòÖĞµÄÎ»ÖÃ
+//æ¯ä¸ªéªŒè¯(4byte) åœ¨ æ•°æ®åŸŸä¸­çš„ä½ç½®
 #define CHECKING_DEVICE_INDEX0 0
 #define CHECKING_DEVICE_INDEX1 8
 #define CHECKING_DEVICE_INDEX2 16
@@ -47,17 +47,17 @@ public:
 
 	libusb_device_handle *m_devh;
 	struct libusb_device* m_dev;
-	int m_isRunning;//¿ØÖÆ½ÓÊÜÊı¾İÏß³Ì
+	int m_isRunning;//æ§åˆ¶æ¥å—æ•°æ®çº¿ç¨‹
 
 
 	DataTransform* m_DataTransform;
-	unsigned int m_nCheckDeviceNum; //Éè±¸ÑéÖ¤°üĞòºÅ
-	byte m_Code[32];//´¢´æÑéÖ¤Éè±¸Ê±µÄÃÜÂë
+	unsigned int m_nCheckDeviceNum; //è®¾å¤‡éªŒè¯åŒ…åºå·
+	byte m_Code[32];//å‚¨å­˜éªŒè¯è®¾å¤‡æ—¶çš„å¯†ç 
 	bool m_bCheckDeviceSucceed;
 	bool m_bGetDeviceStateOK;
-	DATA_STRUCT m_DataStruct;//´æ´¢Ãæ°å¿Ø¼şµÄ²ÎÊıÖµµÄ½á¹¹Ìå
-	VERSION_STRUCT m_VersionStruct;//´æ´¢Ãæ°å°æ±¾ĞÅÏ¢µÄ½á¹¹Ìå
-	EQ_DATA_STRUCT m_EqDataStruct; //¾ùºâµÄ½çÃæÊı¾İ£¨0-240£©
+	DATA_STRUCT m_DataStruct;//å­˜å‚¨é¢æ¿æ§ä»¶çš„å‚æ•°å€¼çš„ç»“æ„ä½“
+	VERSION_STRUCT m_VersionStruct;//å­˜å‚¨é¢æ¿ç‰ˆæœ¬ä¿¡æ¯çš„ç»“æ„ä½“
+	EQ_DATA_STRUCT m_EqDataStruct; //å‡è¡¡çš„ç•Œé¢æ•°æ®ï¼ˆ0-240ï¼‰
 	int m_nMicType;
 	byte m_Seed;
 

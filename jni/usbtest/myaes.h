@@ -4,13 +4,13 @@
 typedef unsigned char  uint8_t;
 typedef unsigned char  byte;
 
-//¼ÓÃÜÊı¾İ.   inbuf, ËÄ¸ö×Ö½Ú£¬ outbuf.ËÄ¸ö×Ö½Ú
+//åŠ å¯†æ•°æ®.   inbuf, å››ä¸ªå­—èŠ‚ï¼Œ outbuf.å››ä¸ªå­—èŠ‚
 void GetAESData(byte * outbuf,const byte * inbuf/*, bool isVad=false*/);
 
-//»ñÈ¡Ëæ»úµÄËÄ¸öbyte
+//è·å–éšæœºçš„å››ä¸ªbyte
 void GetDataNow(byte * inbuf);
 
-//ëS™C«@È¡Ö¸¶¨´óĞ¡µÄëS™C”µ
+//éš¨æ©Ÿç²å–æŒ‡å®šå¤§å°çš„éš¨æ©Ÿæ•¸
 void GetDataBySize(byte* buf, int size);
 
 #endif // AES_H

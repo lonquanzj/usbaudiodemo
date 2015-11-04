@@ -6,7 +6,7 @@ DataTransform::DataTransform(void)
 {
 	m_bIsCRCTrue = false;
 	m_bIsSupportMicVol = false;
-	//m_bIsCloseWinFlag = TRUE; //±ØĞëÎª1
+	//m_bIsCloseWinFlag = TRUE; //å¿…é¡»ä¸º1
 	m_bIsEffectFlag = false;
 	m_bIsAllEqDataFlag = false;
 }
@@ -16,7 +16,7 @@ DataTransform::~DataTransform(void)
 {
 }
 
-byte CCrc_uCrc8Table[256] = // CRC8²éÕÒ±í
+byte CCrc_uCrc8Table[256] = // CRC8æŸ¥æ‰¾è¡¨
 {
 	0x00, 0x31, 0x62, 0x53, 0xc4, 0xf5, 0xa6, 0x97, 0x88, 0xb9, 0xea, 0xdb, 0x4c, 0x7d, 0x2e, 0x1f,
 	0x21, 0x10, 0x43, 0x72, 0xe5, 0xd4, 0x87, 0xb6, 0xa9, 0x98, 0xcb, 0xfa, 0x6d, 0x5c, 0x0f, 0x3e,
@@ -260,7 +260,7 @@ void DataTransform::UPack_SetMicType(byte* pBuff,int* pMicType)
 }
 
 
-//Ğ£Ñé½ÓÊÕµ½µÄÊı¾İ
+//æ ¡éªŒæ¥æ”¶åˆ°çš„æ•°æ®
 void DataTransform::CheckCRC(byte *pBuf)
 {
 	if ( GetCrc8(pBuf, 39) == pBuf[39])
@@ -269,7 +269,7 @@ void DataTransform::CheckCRC(byte *pBuf)
 		m_bIsCRCTrue = false;
 }
 
-//»ñµÃCRC8µÄĞ£ÑéºÍ 
+//è·å¾—CRC8çš„æ ¡éªŒå’Œ 
 byte DataTransform::GetCrc8(const byte *pBuf, int uSize)
 {    
 	byte uCrc = 0 ;

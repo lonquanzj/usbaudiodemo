@@ -3,48 +3,48 @@
 typedef unsigned char byte;
 typedef unsigned int  UINT;
 
-struct DATA_STRUCT //´æ´¢Ãæ°å¿Ø¼şµÄ²ÎÊıÖµµÄ½á¹¹Ìå
+struct DATA_STRUCT //å­˜å‚¨é¢æ¿æ§ä»¶çš„å‚æ•°å€¼çš„ç»“æ„ä½“
 {
-	byte CurrentMode; //µ±Ç°µÄÃæ°åÄ£Ê½       //Î´±£´æµ½Ğ§¹ûÅäÖÃ
-	byte WorkingMode; //¹¤×÷Ä£Ê½
+	byte CurrentMode; //å½“å‰çš„é¢æ¿æ¨¡å¼       //æœªä¿å­˜åˆ°æ•ˆæœé…ç½®
+	byte WorkingMode; //å·¥ä½œæ¨¡å¼
 
-	byte EffectType;  //Ğ§¹ûÖÖÀà
-	byte EffectTime;  //Ğ§¹ûÊ±¼ä
-	byte EffectVol;   //Ğ§¹ûÒôÁ¿
+	byte EffectType;  //æ•ˆæœç§ç±»
+	byte EffectTime;  //æ•ˆæœæ—¶é—´
+	byte EffectVol;   //æ•ˆæœéŸ³é‡
 
-	byte EvadeDoor;   //ÉÁ±ÜÃÅÏŞ
-	byte EvadeSpeed;  //ÉÁ±ÜËÙ¶È
-	byte EvadeRank;   //ÉÁ±ÜµÈ¼¶
+	byte EvadeDoor;   //é—ªé¿é—¨é™
+	byte EvadeSpeed;  //é—ªé¿é€Ÿåº¦
+	byte EvadeRank;   //é—ªé¿ç­‰çº§
 
-	byte MusicVol;    //ÒôÀÖÒôÁ¿
-	byte MicVol1;     //»°Í²1ÒôÁ¿
+	byte MusicVol;    //éŸ³ä¹éŸ³é‡
+	byte MicVol1;     //è¯ç­’1éŸ³é‡
 
-	byte MusicMute;   //ÒôÀÖ¾²Òô
-	byte Mic1Mute;    //»°Í²1¾²Òô
+	byte MusicMute;   //éŸ³ä¹é™éŸ³
+	byte Mic1Mute;    //è¯ç­’1é™éŸ³
 
-	byte MonitorVol;   //¼àÌıÒôÁ¿
-	byte RecordVol;    //Â¼ÒôÒôÁ¿
-	byte MonitorMute;  //¼àÌı¾²Òô
-	byte RecordMute;   //Â¼Òô¾²Òô
-	byte MixSwitch;    //»ìÒô¿ª¹Ø
+	byte MonitorVol;   //ç›‘å¬éŸ³é‡
+	byte RecordVol;    //å½•éŸ³éŸ³é‡
+	byte MonitorMute;  //ç›‘å¬é™éŸ³
+	byte RecordMute;   //å½•éŸ³é™éŸ³
+	byte MixSwitch;    //æ··éŸ³å¼€å…³
 
-	byte MusicEffect;   //ÒôÀÖĞ§¹û
+	byte MusicEffect;   //éŸ³ä¹æ•ˆæœ
 };
 
-struct VERSION_STRUCT //´æ´¢Ãæ°å°æ±¾ĞÅÏ¢µÄ½á¹¹Ìå
+struct VERSION_STRUCT //å­˜å‚¨é¢æ¿ç‰ˆæœ¬ä¿¡æ¯çš„ç»“æ„ä½“
 {
-	byte YearMonthDay[3]; //³ö³§ÄêÔÂÈÕ
-	byte SoftVersion;     //Èí¼ş°æ±¾ºÅ
-	byte HardVersion;     //Ó²¼ş°æ±¾ºÅ
-	byte TreatyVersion;   //Ğ­Òé°æ±¾ºÅ
+	byte YearMonthDay[3]; //å‡ºå‚å¹´æœˆæ—¥
+	byte SoftVersion;     //è½¯ä»¶ç‰ˆæœ¬å·
+	byte HardVersion;     //ç¡¬ä»¶ç‰ˆæœ¬å·
+	byte TreatyVersion;   //åè®®ç‰ˆæœ¬å·
 
-	byte GUID[12];        //Éè±¸GUID 
-	byte ProductType[2];  //²úÆ·ĞÍºÅ ProductType[0]µÍ×Ö£¬ProductType[1]¸ß×Ö
-	byte ProductNumber[2];//²úÆ·Åú´Î ProductNumber[0]µÍ×Ö£¬ProductNumber[1]¸ß×Ö
+	byte GUID[12];        //è®¾å¤‡GUID 
+	byte ProductType[2];  //äº§å“å‹å· ProductType[0]ä½å­—ï¼ŒProductType[1]é«˜å­—
+	byte ProductNumber[2];//äº§å“æ‰¹æ¬¡ ProductNumber[0]ä½å­—ï¼ŒProductNumber[1]é«˜å­—
 
 };
 
-struct EQ_DATA_STRUCT  //¾ùºâµÄ½çÃæÊı¾İ£¨0-240£©
+struct EQ_DATA_STRUCT  //å‡è¡¡çš„ç•Œé¢æ•°æ®ï¼ˆ0-240ï¼‰
 {
 	byte EQ1_low;
 	byte EQ1_mid;
@@ -57,30 +57,30 @@ struct EQ_DATA_STRUCT  //¾ùºâµÄ½çÃæÊı¾İ£¨0-240£©
 
 //enum ControlFlag
 //{
-//	eCurrentMode, //µ±Ç°µÄÃæ°åÄ£Ê½
-//	eWorkingMode, //¹¤×÷Ä£Ê½
+//	eCurrentMode, //å½“å‰çš„é¢æ¿æ¨¡å¼
+//	eWorkingMode, //å·¥ä½œæ¨¡å¼
 //
-//	eEffectType,  //Ğ§¹ûÖÖÀà
-//	eEffectTime,  //Ğ§¹ûÊ±¼ä
-//	eEffectVol,   //Ğ§¹ûÒôÁ¿
-//	eEvadeDoor,   //ÉÁ±ÜÃÅÏŞ
-//	eEvadeSpeed,  //ÉÁ±ÜËÙ¶È
-//	eEvadeRank,   //ÉÁ±ÜµÈ¼¶
+//	eEffectType,  //æ•ˆæœç§ç±»
+//	eEffectTime,  //æ•ˆæœæ—¶é—´
+//	eEffectVol,   //æ•ˆæœéŸ³é‡
+//	eEvadeDoor,   //é—ªé¿é—¨é™
+//	eEvadeSpeed,  //é—ªé¿é€Ÿåº¦
+//	eEvadeRank,   //é—ªé¿ç­‰çº§
 //
-//	eMusicVol,    //ÒôÀÖÒôÁ¿
-//	eMicVol1,     //»°Í²1ÒôÁ¿
-//	eMicVol2,     //»°Í²2ÒôÁ¿
-//	eMusicMute,   //ÒôÀÖ¾²Òô
-//	eMic1Mute,    //»°Í²1¾²Òô
-//	eMic2Mute,    //»°Í²2¾²Òô
-//	eLine_in_vol,  //LINE IN ÒôÁ¿
-//	eLine_in_mute, //LINE IN ¾²Òô
+//	eMusicVol,    //éŸ³ä¹éŸ³é‡
+//	eMicVol1,     //è¯ç­’1éŸ³é‡
+//	eMicVol2,     //è¯ç­’2éŸ³é‡
+//	eMusicMute,   //éŸ³ä¹é™éŸ³
+//	eMic1Mute,    //è¯ç­’1é™éŸ³
+//	eMic2Mute,    //è¯ç­’2é™éŸ³
+//	eLine_in_vol,  //LINE IN éŸ³é‡
+//	eLine_in_mute, //LINE IN é™éŸ³
 //
-//	eMonitorVol,   //¼àÌıÒôÁ¿
-//	eRecordVol,     //Â¼ÒôÒôÁ¿
-//	eMonitorMute,   //¼àÌı¾²Òô
-//	eRecordMute,     //Â¼Òô¾²Òô
-//	eMixSwitch     //»ìÒô¿ª¹Ø
+//	eMonitorVol,   //ç›‘å¬éŸ³é‡
+//	eRecordVol,     //å½•éŸ³éŸ³é‡
+//	eMonitorMute,   //ç›‘å¬é™éŸ³
+//	eRecordMute,     //å½•éŸ³é™éŸ³
+//	eMixSwitch     //æ··éŸ³å¼€å…³
 //};
 
 
@@ -117,9 +117,9 @@ public:
 
 public:
 	bool m_bIsCRCTrue;
-	bool m_bIsSupportMicVol; //FALSE ´ú±í²»Ö§³Öº°ÂóÒôÁ¿Ìõ, TRUE ´ú±íÖ§³Ö.
-	//BOOL m_bIsCloseWinFlag; //¿ØÖÆÃæ°å¹Ø±ÕÊ±£¬·¢ËÍ0£¬Æ½Ê±Ê¹ÓÃ1
-	bool m_bIsEffectFlag;    //ÏÂ·¢Ğ§¹ûÅäÖÃÎª1£¬ÆÕÍ¨ÉèÖÃ²ÎÊıÎª0
-	bool m_bIsAllEqDataFlag;    //ÏÂ·¢È«²¿QEÖµÎª1£¬µ¥¸öÎª0
+	bool m_bIsSupportMicVol; //FALSE ä»£è¡¨ä¸æ”¯æŒå–Šéº¦éŸ³é‡æ¡, TRUE ä»£è¡¨æ”¯æŒ.
+	//BOOL m_bIsCloseWinFlag; //æ§åˆ¶é¢æ¿å…³é—­æ—¶ï¼Œå‘é€0ï¼Œå¹³æ—¶ä½¿ç”¨1
+	bool m_bIsEffectFlag;    //ä¸‹å‘æ•ˆæœé…ç½®ä¸º1ï¼Œæ™®é€šè®¾ç½®å‚æ•°ä¸º0
+	bool m_bIsAllEqDataFlag;    //ä¸‹å‘å…¨éƒ¨QEå€¼ä¸º1ï¼Œå•ä¸ªä¸º0
 };
 

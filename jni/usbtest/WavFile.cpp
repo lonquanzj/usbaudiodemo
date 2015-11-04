@@ -13,9 +13,9 @@
 
 //WavFile::WavFile(){
 //	m_winfo = new WAVEFORMATEX;
-////	m_currentReadPositionInFlie += 22;//Ìø¹ýwavÎÄ¼þÍ·
+////	m_currentReadPositionInFlie += 22;//è·³è¿‡wavæ–‡ä»¶å¤´
 //	totalAudioLen = 0;
-//	setRecWavHead();//»¹²»È·¶¨Êý¾Ý³¤¶È£¬ÏÈ³õÊ¼»¯ÔÙËµ
+//	setRecWavHead();//è¿˜ä¸ç¡®å®šæ•°æ®é•¿åº¦ï¼Œå…ˆåˆå§‹åŒ–å†è¯´
 //}
 
 WavFile::WavFile(char *playFileName = "/sdcard/0test/play.wav", char *recFileName = "/sdcard/0test/rec.wav") {
@@ -23,9 +23,9 @@ WavFile::WavFile(char *playFileName = "/sdcard/0test/play.wav", char *recFileNam
 	m_playFileName = playFileName;
 
 	m_winfo = new WAVEFORMATEX;
-//	m_currentReadPositionInFlie += 22;//Ìø¹ýwavÎÄ¼þÍ·
+//	m_currentReadPositionInFlie += 22;//è·³è¿‡wavæ–‡ä»¶å¤´
 	totalAudioLen = 0;
-	setRecWavHead();//»¹²»È·¶¨Êý¾Ý³¤¶È£¬ÏÈ³õÊ¼»¯ÔÙËµ
+	setRecWavHead();//è¿˜ä¸ç¡®å®šæ•°æ®é•¿åº¦ï¼Œå…ˆåˆå§‹åŒ–å†è¯´
 }
 
 WavFile::~WavFile() {
@@ -53,7 +53,7 @@ bool WavFile::openPlayWavFile(){
 
 
 
-int WavFile::mixWavFile(){//ºÏ³ÉÂ¼Òô+°é×à
+int WavFile::mixWavFile(){//åˆæˆå½•éŸ³+ä¼´å¥
 	return 0;
 }
 
@@ -103,83 +103,83 @@ void WavFile::closePlayFile(){
 
 void WavFile::setRecWavHead(){
 
-	long fileCurrPos = lseek(m_handleRecWavFile, 0, SEEK_CUR);//»ñÈ¡ÎÄ¼þÖ¸Õëµ±Ç¡Æ«ÒÆÁ¿
+	long fileCurrPos = lseek(m_handleRecWavFile, 0, SEEK_CUR);//èŽ·å–æ–‡ä»¶æŒ‡é’ˆå½“æ°åç§»é‡
 	if(fileCurrPos > 44){
 		totalAudioLen = fileCurrPos - 44;
 	}
 
 
 	long totalDataLen = totalAudioLen + 44 - 8;
-	int channels = 2;//Í¨µÀÊý
-	int sampleRate = 48000;//²ÉÑùÂÊ
-	int ENCODING_PCM = 16; //²ÉÑù¾«¶È  byzj
-	int rate = ENCODING_PCM * sampleRate * channels / 8;//²¨ÐÎÒôÆµÊý¾Ý´«ËÍËÙÂÊ£¬ÆäÖµÎªÍ¨µÀÊý¡ÁÃ¿ÃëÊý¾ÝÎ»Êý¡ÁÃ¿Ñù±¾µÄÊý¾ÝÎ»Êý£¯8¡£²¥·ÅÈí¼þÀûÓÃ´ËÖµ¿ÉÒÔ¹À¼Æ»º³åÇøµÄ´óÐ¡¡£
+	int channels = 2;//é€šé“æ•°
+	int sampleRate = 48000;//é‡‡æ ·çŽ‡
+	int ENCODING_PCM = 16; //é‡‡æ ·ç²¾åº¦  byzj
+	int rate = ENCODING_PCM * sampleRate * channels / 8;//æ³¢å½¢éŸ³é¢‘æ•°æ®ä¼ é€é€ŸçŽ‡ï¼Œå…¶å€¼ä¸ºé€šé“æ•°Ã—æ¯ç§’æ•°æ®ä½æ•°Ã—æ¯æ ·æœ¬çš„æ•°æ®ä½æ•°ï¼8ã€‚æ’­æ”¾è½¯ä»¶åˆ©ç”¨æ­¤å€¼å¯ä»¥ä¼°è®¡ç¼“å†²åŒºçš„å¤§å°ã€‚
 
-	//×ÊÔ´½»»»ÎÄ¼þ±êÖ¾£¨RIFF£©
+	//èµ„æºäº¤æ¢æ–‡ä»¶æ ‡å¿—ï¼ˆRIFFï¼‰
 	wavHead[0] = 'R';
 	wavHead[1] = 'I';
 	wavHead[2] = 'F';
 	wavHead[3] = 'F';
 
-	//´ÓÏÂ¸öµØÖ·¿ªÊ¼µ½ÎÄ¼þÎ²µÄ×Ü×Ö½ÚÊý
+	//ä»Žä¸‹ä¸ªåœ°å€å¼€å§‹åˆ°æ–‡ä»¶å°¾çš„æ€»å­—èŠ‚æ•°
 	wavHead[4] = (unsigned char) ( totalDataLen        & 0xff);
 	wavHead[5] = (unsigned char) ((totalDataLen >> 8)  & 0xff);
 	wavHead[6] = (unsigned char) ((totalDataLen >> 16) & 0xff);
 	wavHead[7] = (unsigned char) ((totalDataLen >> 24) & 0xff);
 
-	//WAVÎÄ¼þ±êÖ¾£¨WAVE£©
+	//WAVæ–‡ä»¶æ ‡å¿—ï¼ˆWAVEï¼‰
 	wavHead[8] = 'W';
 	wavHead[9] = 'A';
 	wavHead[10] = 'V';
 	wavHead[11] = 'E';
 
-	//²¨ÐÎ¸ñÊ½±êÖ¾£¨fmt £©£¬×îºóÒ»Î»¿Õ¸ñ¡£
+	//æ³¢å½¢æ ¼å¼æ ‡å¿—ï¼ˆfmt ï¼‰ï¼Œæœ€åŽä¸€ä½ç©ºæ ¼ã€‚
 	wavHead[12] = 'f'; // 'fmt ' chunk
 	wavHead[13] = 'm';
 	wavHead[14] = 't';
 	wavHead[15] = ' ';
 
-	//¹ýÂË×Ö½Ú£¨Ò»°ãÎª00000010H£©
+	//è¿‡æ»¤å­—èŠ‚ï¼ˆä¸€èˆ¬ä¸º00000010Hï¼‰
 	wavHead[16] = 16; // 4 bytes: size of 'fmt ' chunk
 	wavHead[17] = 0;
 	wavHead[18] = 0;
 	wavHead[19] = 0;
 
-	//ÖµÎª1Ê±£¬±íÊ¾Êý¾ÝÎªÏßÐÔPCM±àÂë£©
+	//å€¼ä¸º1æ—¶ï¼Œè¡¨ç¤ºæ•°æ®ä¸ºçº¿æ€§PCMç¼–ç ï¼‰
 	wavHead[20] = 1; // format = 1
 	wavHead[21] = 0;
 
-	//ÉùµÀ
+	//å£°é“
 	wavHead[22] = (unsigned char) channels;
 	wavHead[23] = 0;
 
-	//²ÉÑùÆµÂÊ BB80->48000
+	//é‡‡æ ·é¢‘çŽ‡ BB80->48000
 	wavHead[24] = (unsigned char) ( sampleRate        & 0xff);
 	wavHead[25] = (unsigned char) ((sampleRate >> 8)  & 0xff);
 	wavHead[26] = (unsigned char) ((sampleRate >> 16) & 0xff);
 	wavHead[27] = (unsigned char) ((sampleRate >> 24) & 0xff);
 
-	//²¨ÐÎÊý¾Ý´«ÊäËÙÂÊ£¨Ã¿ÃëÆ½¾ù×Ö½ÚÊý£© (2EE00->192000
+	//æ³¢å½¢æ•°æ®ä¼ è¾“é€ŸçŽ‡ï¼ˆæ¯ç§’å¹³å‡å­—èŠ‚æ•°ï¼‰ (2EE00->192000
 	wavHead[28] = (unsigned char) ( rate        & 0xff);
 	wavHead[29] = (unsigned char) ((rate >> 8)  & 0xff);
 	wavHead[30] = (unsigned char) ((rate >> 16) & 0xff);
 	wavHead[31] = (unsigned char) ((rate >> 24) & 0xff);
 
-	 // dataÊý¾Ý¿é³¤¶È£¬×Ö½Ú      Ò»¸ö²ÉÑù¶àÉùµÀÊý¾Ý¿é´óÐ¡
+	 // dataæ•°æ®å—é•¿åº¦ï¼Œå­—èŠ‚      ä¸€ä¸ªé‡‡æ ·å¤šå£°é“æ•°æ®å—å¤§å°
 	wavHead[32] = (unsigned char) (2 * 16 / 8);
 	wavHead[33] = 0;
 
-	//PCMÎ»¿í Ò»¸ö²ÉÑùÕ¼µÄbitÊý
+	//PCMä½å®½ ä¸€ä¸ªé‡‡æ ·å çš„bitæ•°
 	wavHead[34] = 16;
 	wavHead[35] = 0;
 
-	//¡°fact¡±,¸Ã²¿·ÖÒ»ÏÂÊÇ¿ÉÑ¡²¿·Ö£¬¼´¿ÉÄÜÓÐ£¬¿ÉÄÜÃ»ÓÐ,Ò»°ãµ½WAVÎÄ¼þÓÉÄ³Ð©Èí¼þ×ª»»¶ø³ÉÊ±£¬°üº¬Õâ²¿·Ö¡£
+	//â€œfactâ€,è¯¥éƒ¨åˆ†ä¸€ä¸‹æ˜¯å¯é€‰éƒ¨åˆ†ï¼Œå³å¯èƒ½æœ‰ï¼Œå¯èƒ½æ²¡æœ‰,ä¸€èˆ¬åˆ°WAVæ–‡ä»¶ç”±æŸäº›è½¯ä»¶è½¬æ¢è€Œæˆæ—¶ï¼ŒåŒ…å«è¿™éƒ¨åˆ†ã€‚
 	wavHead[36] = 'd';
 	wavHead[37] = 'a';
 	wavHead[38] = 't';
 	wavHead[39] = 'a';
 
-	//size,ÊýÖµÎª4
+	//size,æ•°å€¼ä¸º4
 	wavHead[40] = (unsigned char) ( totalAudioLen        & 0xff);
 	wavHead[41] = (unsigned char) ((totalAudioLen >> 8)  & 0xff);
 	wavHead[42] = (unsigned char) ((totalAudioLen >> 16) & 0xff);
@@ -197,14 +197,14 @@ void WavFile::get_wav_info()
 	if (read(m_handlePlayWavFile, (char*)buff, 0x2c)==0) return;
 
 	if (strncmp("WAVEfmt", (char *)buff + 8, 7) != 0 )
-	{//·Çwav¸ñÊ½ÔÛ²»ÀíËû
+	{//éžwavæ ¼å¼å’±ä¸ç†ä»–
 		close(m_handlePlayWavFile);
 		wxLogFuckMain("Not Wav File !");
 		return;
 	}
 
-	//´ÓÒôÆµÊý¾ÝµÄÆðÊ¼×¥È¡ ÐÅÏ¢£¬ÓÃÓÚ²¥·Å²¨ÌØÂÊÉèÖÃµÈ
-	m_winfo->wFormatTag			= 0x01;			 //±íÊ¾pcm±àÂë
+	//ä»ŽéŸ³é¢‘æ•°æ®çš„èµ·å§‹æŠ“å– ä¿¡æ¯ï¼Œç”¨äºŽæ’­æ”¾æ³¢ç‰¹çŽ‡è®¾ç½®ç­‰
+	m_winfo->wFormatTag			= 0x01;			 //è¡¨ç¤ºpcmç¼–ç 
 	m_winfo->nChannels		    = *(short *)(buff+0x16);
 	m_winfo->nSamplesPerSec		= *(int *)(buff+0x18);
 	m_winfo->nAvgBytesPerSec	= *(int *)(buff+0x1c);

@@ -12,13 +12,13 @@
 
 
 typedef struct tWAVEFORMATEX{
-	short wFormatTag;	  	//  ¸ñÊ½±êÖ¾£¬01±íÊ¾pcm  Ã»±»Ñ¹ËõµÄ
-	short nChannels;	  	//  ÉùµÀÊı  1Îªµ¥ÉùµÀ  2ÎªÁ¢ÌåÉù   4Îª4ÉùµÀ
-	int nSamplesPerSec;	//  ²ÉÑùÆµÂÊ 0x5622´ú±í22050 »¹ÓĞ11025  44100µÈ
-	int nAvgBytesPerSec;// Ã¿ÃëÒª²¥·ÅµÄ×Ö½ÚÊı =nChannels* nBlockAlign
-	short nBlockAlign;	   // ²ÉÑùÒ»¸öµãÊ±µÄ×Ü×Ö½ÚÊı 16Î»µ¥ÉùµÀÎª2  16Î»Ë«ÉùµÀÎª4
-	short wBitsPerSample; 		// ÒôÆµ²ÉÑù´óĞ¡
-	int cbSize;		  			 // ÒôÆµÊı¾İµÄ´óĞ¡
+	short wFormatTag;	  	//  æ ¼å¼æ ‡å¿—ï¼Œ01è¡¨ç¤ºpcm  æ²¡è¢«å‹ç¼©çš„
+	short nChannels;	  	//  å£°é“æ•°  1ä¸ºå•å£°é“  2ä¸ºç«‹ä½“å£°   4ä¸º4å£°é“
+	int nSamplesPerSec;	//  é‡‡æ ·é¢‘ç‡ 0x5622ä»£è¡¨22050 è¿˜æœ‰11025  44100ç­‰
+	int nAvgBytesPerSec;// æ¯ç§’è¦æ’­æ”¾çš„å­—èŠ‚æ•° =nChannels* nBlockAlign
+	short nBlockAlign;	   // é‡‡æ ·ä¸€ä¸ªç‚¹æ—¶çš„æ€»å­—èŠ‚æ•° 16ä½å•å£°é“ä¸º2  16ä½åŒå£°é“ä¸º4
+	short wBitsPerSample; 		// éŸ³é¢‘é‡‡æ ·å¤§å°
+	int cbSize;		  			 // éŸ³é¢‘æ•°æ®çš„å¤§å°
 }WAVEFORMATEX;
 
 
@@ -34,8 +34,8 @@ public:
 	void closeRecFile();
 	bool openPlayWavFile();
 	void closePlayFile();
-//	int readWavFile(short *destBuffer, int i_bufferSizeFrames);//Ã¿´Î¶Á¶àÉÙ¸öFrame ·µ»Ø³É¹¦µÄ¸öÊı
-	int mixWavFile();//ºÏ³ÉÂ¼Òô+°é×à
+//	int readWavFile(short *destBuffer, int i_bufferSizeFrames);//æ¯æ¬¡è¯»å¤šå°‘ä¸ªFrame è¿”å›æˆåŠŸçš„ä¸ªæ•°
+	int mixWavFile();//åˆæˆå½•éŸ³+ä¼´å¥
 	void get_wav_info();
 
 	bool dealRecDataCallback(void *outputBuffer, int outFramesize);
@@ -49,7 +49,7 @@ private:
 	int m_handleRecWavFile;
     long totalAudioLen;
     unsigned char wavHead[44];
-	int m_fileSizeFrames;//ÒôÀÖÎÄ¼şFrame´óĞ¡
+	int m_fileSizeFrames;//éŸ³ä¹æ–‡ä»¶Frameå¤§å°
 	WAVEFORMATEX *m_winfo;
 };
 
