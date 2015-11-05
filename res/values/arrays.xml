@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="yinxiao">
+        
+        <item>原声</item>
+        <item>录音棚</item>
+        <item>演唱会</item>
+        <item>KTV</item>
+        <item>经典男声</item>
+        <item>经典女声</item>
+        <item>我的音效1</item>
+        <item>我的音效2</item>
+        <item>我的音效3</item>
+        <item>自定义</item>
+    </string-array>
+    
+    <string-array name="set_HunXiangQi">
+        <item>小厅效果</item>
+        <item>房间效果</item>
+        <item>KTV效果</item>
+        <item>浴室效果</item>
+        <item>体育馆效果</item>
+        <item>音乐厅效果</item>
+    </string-array>
+    
+      <string-array name="set_RenShengBianDiao">
+        <item>小孩声</item>
+        <item>高音女声</item>
+        <item>低音男声</item>
+        <item>怪兽声</item>
+    </string-array>
+      <string-array name="set_RenShengJunHeng">
+        <item>经典男声</item>
+        <item>经典女声</item>
+        <item>民族</item>
+    </string-array>
+    
+    <string-array name="set_YinYueJunHeng">
+        <item>摇滚</item>
+        <item>流行</item>
+        <item>爵士</item>
+        <item>古典</item>
+        <item>重低音</item>
+    </string-array>
+    
+  
+    
+    <string-array name="set_ShanBi">
+        <item>配置1</item>
+        <item>配置2</item>
+        <item>配置3</item>
+         <item>自定义</item>
+    </string-array>
+	
+    
+</resources>

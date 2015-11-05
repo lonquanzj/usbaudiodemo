@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" 
+    android:id="@+id/ll_bg"
+   >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+        >
+	<ImageView
+	    android:id="@+id/item_img"
+	    android:layout_width="wrap_content"
+	    android:layout_height="80dp"
+	    android:background="@drawable/k30_zb_lyp"
+	    android:scaleType="center"
+	    />
+	
+</RelativeLayout>
+	<TextView
+	     android:layout_gravity="center_horizontal"
+	    android:id="@+id/item_tv_yinxiao"
+	    android:layout_marginTop="3dp"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="录音棚" />
+</LinearLayout>

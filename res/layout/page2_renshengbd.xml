@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/activity_padding"
+    android:background="@drawable/layout_shape"
+    android:padding="@dimen/activity_padding"
+    android:orientation="vertical" >
+   
+   <TextView
+	    android:id="@+id/tv_junHengQiCurrentSet"
+	     android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+	    android:text="当前配置:"
+	    />
+   
+   <RelativeLayout
+         android:layout_width="match_parent"
+	   	 android:layout_height="wrap_content"
+	   	 android:orientation="horizontal"
+	   
+        >
+	<SeekBar 
+	      android:id="@+id/sb_renshengbiandiao"
+	    android:layout_toRightOf="@+id/tv_eq0"
+	    android:layout_marginLeft="15dp"
+	    android:layout_marginRight="15dp"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	     android:progress="50"
+	    />
+
+	<TextView
+	    android:id="@+id/tv_eq0"
+	    android:layout_width="50dp"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_centerVertical="true"
+	    android:text="音调" />
+	<TextView
+	   android:id="@+id/tv_renshengbiandiao"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_centerVertical="true"
+	    android:text="50" />
+
+	</RelativeLayout>
+	
+	 <GridView 
+	     android:layout_marginTop="10dp"
+         android:id="@+id/gridview_renshengbiandiao"
+         android:layout_width="match_parent"
+	   	 android:layout_height="wrap_content"
+	   	 android:horizontalSpacing="5dp"
+	   	 android:numColumns="4"/>
+	  <Button 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="保存设置"
+        android:onClick="save"
+        />
+</LinearLayout>
