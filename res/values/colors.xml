@@ -19,4 +19,5 @@
     <color name="holo_orange_dark">#ffff8800</color>
     <color name="dialog_text_hint">#ffb0b0b0</color>
     
+     <color name="selectedBgColor">#5ABBFF</color>
 </resources>

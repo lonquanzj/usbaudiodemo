@@ -30,6 +30,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.YinXiaoActivity"></activity>
+        <activity android:name=".activity.PageMain_PluginActivity"></activity>
+        <activity android:name=".activity.Page1_HunXiangQiActivity"></activity>
+        <activity android:name=".activity.Page2_RenShengBianDiaoActivity"></activity>
+        <activity android:name=".activity.Page3_RenShengJunHengQiActivity"></activity>
+        <activity android:name=".activity.Page4_JunHengQiActivity"></activity>
+        <activity android:name=".activity.ShanBiActivity"></activity>
+        <activity android:name=".activity.LuYinActivity"></activity>
     </application>
 
 </manifest>

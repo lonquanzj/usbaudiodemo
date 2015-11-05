@@ -263,8 +263,8 @@ public class MainActivity extends Activity {
 				}
 				break;
 			case R.id.btn_mixer://混音
-//				Intent intent = new Intent(MainActivity.this, YinXiaoActivity.class);
-//				startActivity(intent);
+				Intent intent = new Intent(MainActivity.this, YinXiaoActivity.class);
+				startActivity(intent);
 				break;
 			case R.id.btn_record://录音
 				break;
