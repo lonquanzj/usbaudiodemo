@@ -18,7 +18,7 @@
 //	setRecWavHead();//还不确定数据长度，先初始化再说
 //}
 
-WavFile::WavFile(char *playFileName = "/sdcard/0test/play.wav", char *recFileName = "/sdcard/0test/rec.wav") {
+WavFile::WavFile(char *playFileName, char *recFileName = NULL) {
 	m_recFileName = recFileName;
 	m_playFileName = playFileName;
 

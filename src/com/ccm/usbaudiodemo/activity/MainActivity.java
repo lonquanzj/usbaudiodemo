@@ -245,7 +245,7 @@ public class MainActivity extends Activity {
     	mBtn_rec.setOnClickListener(mClickListner);
     	mBtn_play = (ImageButton) findViewById(R.id.btn_play);
     	mBtn_play.setOnClickListener(mClickListner);
-    	mBtn_stop = (ImageButton) findViewById(R.id.btn_pause);
+    	mBtn_stop = (ImageButton) findViewById(R.id.btn_stop);
     	mBtn_stop.setOnClickListener(mClickListner);
     	mtvLog = (TextView) findViewById(R.id.tv_log);
 		mTvTile = (TextView)findViewById(R.id.tv_curr_file);
@@ -260,6 +260,7 @@ public class MainActivity extends Activity {
 				if (connectClicked()) {
 					mBtn_connect.setEnabled(false);
 					mBtn_connect.setText("已连接");
+					mIsConnectDev = true;
 				}
 				break;
 			case R.id.btn_mixer://混音
@@ -269,9 +270,19 @@ public class MainActivity extends Activity {
 			case R.id.btn_record://录音
 				break;
 			case R.id.btn_play://放音
+				if(mIsConnectDev){
+					play(true, false);
+				}else{
+					sendMsgAppendLog("设备未连接");
+				}
 				break;
 			case R.id.btn_stop://停止
-				
+				if(mIsConnectDev){
+					stopClicked();
+					sendMsgAppendLog("停止");
+				}else{
+					sendMsgAppendLog("设备未连接");
+				}
 				break;
 			default:
 				break;

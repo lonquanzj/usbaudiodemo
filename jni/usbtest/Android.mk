@@ -11,7 +11,7 @@ LOCAL_SRC_FILES := \
     ToJava.cpp \
     USBControl.cpp \
     WavFile.cpp \
-    OpenSLStream.cpp \
+    PlayControl.cpp \
     test.cpp \
     myaes.cpp	\
     HIDThansfer.cpp \

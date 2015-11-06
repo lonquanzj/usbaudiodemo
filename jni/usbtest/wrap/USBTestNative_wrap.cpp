@@ -400,7 +400,7 @@ SWIGEXPORT jboolean JNICALL Java_com_ccm_usbaudiodemo_usbcontrol_USBTestNativeJN
   arg4 = (int)jarg4; 
   arg5 = (int)jarg5; 
   arg6 = (int)jarg6; 
-  result = (bool)(arg1)->startOpenSLES(arg2,arg3,arg4,arg5,arg6);
+  result = (bool)(arg1)->startMusicCtrl(arg2,arg3,arg4,arg5,arg6);
   jresult = (jboolean)result; 
   return jresult;
 }

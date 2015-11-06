@@ -2,7 +2,7 @@
 
 #include <wx/string.h>
 #include <semaphore.h>
-#include "OpenSLStream.h"
+#include "PlayControl.h"
 
 class InputMonitorBuffer;
 class USBAudioManager;
@@ -96,7 +96,7 @@ public:
      *  Start playback and/or recording from the Android side (mic and earpiece). Sample rates are limited to 48000Hz max and are dependant
      *  on the specific device. In 99.9% of the cases, 44100 and 48000 are available.
      */
-    bool startOpenSLES(bool i_play,
+    bool startMusicCtrl(bool i_play,
                        bool i_record,
                        int i_actualChannelsRecording,
                        int i_sampleRate,
@@ -145,9 +145,9 @@ private:
                                USBAudioStreamConfig * i_streamConfig,
                                void *i_userData);
 
-    static void openSLCallback(void *context, int sample_rate, int buffer_frames,
-                               int input_channels, const short *input_buffer,
-                               int output_channels, short *output_buffer);
+    static void musicCtrlCallback(void *context, int sample_rate, int buffer_frames,
+            int output_channels, short *output_buffer,
+            int input_channels, short *input_buffer);
 
     USBAudioManager *m_USBAudioManager;
 
@@ -155,7 +155,7 @@ private:
     bool m_recording;
 
     // OpenSLES stream for recording from the mic and playing through the earpiece
-    OPENSL_STREAM *m_openSlStream;
+    PlayControl *m_playControl;
 
     InputMonitorBuffer *m_bufferFromOpenSLESToUSB;
     InputMonitorBuffer *m_bufferFromUSBToOpenSLES;
