@@ -10,6 +10,7 @@
 #include <string.h>
 #include <WavFile.h>
 #include "PortDefs.h"
+#include "test.h"
 
 WavFile::WavFile(/*char *playFileName*//*, char *recFileName = NULL*/) {
 	memset(m_recFileName, 0, sizeof(m_recFileName));
@@ -17,6 +18,8 @@ WavFile::WavFile(/*char *playFileName*//*, char *recFileName = NULL*/) {
 	m_winfo = new WAVEFORMATEX;
 //	m_currentReadPositionInFlie += 22;//跳过wav文件头
 	totalAudioLen = 0;
+	m_handlePlayWavFile = 0;
+	m_handleRecWavFile = 0;
 }
 
 WavFile::~WavFile() {
@@ -69,43 +72,47 @@ int WavFile::prepareWriteWavFile(){
     	}
 
 	setWavHead();//还不确定数据长度，先初始化再说
-
 	return 0;
 }
 
 
-bool WavFile::writeWavFile(void *outputBuffer, int size){
+bool WavFile::writeWavFile(void *buffer, int size){
 
-	wxLogFuckMain("writeWavFile");
-	/*int len;
-	if((len == write(m_handleRecWavFile, outputBuffer, size))  == -1){
+//	wxLogFuckMain("writeWavFile");
+//	dayinqianjige(buffer);
+	int len;
+	if((len == write(m_handleRecWavFile, buffer, size))  == -1){
 		wxLogFuckMain("Write Rec File Fail!");
 		return false;
-	}*/
+	}
 	return true;
 }
 
-bool WavFile::readWavFile(void *inputBuffer, int size){
+bool WavFile::readWavFile(void *buffer, int size){
 //	wxLogFuckMain("readWavFile");
 	int len = 0;
-	if((len == read(m_handlePlayWavFile, inputBuffer, size)) == -1){
+	if((len == read(m_handlePlayWavFile, buffer, size)) == -1){
 		wxLogFuckMain("Read Music File Fail!");
 		return false;
 	}
 	return true;
 }
 
-void WavFile::closeRecFile(){
-	setWavHead();
-	close(m_handleRecWavFile);
-}
-
-
-void WavFile::closePlayFile(){
-	close(m_handlePlayWavFile);
+void WavFile::closeAllFile(){
+	if(m_handlePlayWavFile){
+		close(m_handlePlayWavFile);
+		wxLogFuckMain("close play file!");
+	}
+	if(m_handleRecWavFile){
+		setWavHead();
+		close(m_handleRecWavFile);
+		wxLogFuckMain("close rec file!");
+	}
 }
 
 void WavFile::setWavHead(){
+
+	if(m_handleRecWavFile == 0) return;
 
 	long fileCurrPos = lseek(m_handleRecWavFile, 0, SEEK_CUR);//获取文件指针当恰偏移量
 	if(fileCurrPos > 44){

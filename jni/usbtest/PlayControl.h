@@ -66,13 +66,12 @@ public:
 
 	Myresult openPlayThread ();
 	Myresult openRecThread ();
-	bool handlePlayData(void *pBuffer,int size);
-	Myresult handleRecData(const void *pBuffer,int size);
+	void handlePlayData(void *pBuffer,int size);
+	void handleRecData(void *pBuffer,int size);
 //	Myresult myClear();
 
 	int nextIndex(int index, int increment);
 
-	void openPlayFile(const char* wavFileName/*, int size*/);
 
 public:
 	PlayControl();
@@ -85,6 +84,10 @@ public:
 	int start();
 	void pause();
     void stop();
+
+
+	void openPlayFile(const char* wavFileName/*, int size*/);
+	void openRecFile(const char* wavFileName/*, int size*/);
 
 };
 

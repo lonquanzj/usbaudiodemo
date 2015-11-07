@@ -141,7 +141,7 @@ void InputMonitorBuffer::copyFromBuffer(short *o_destDataPtr, int i_bufferSizeFr
     {
         checkMemoryBarrierHit("in copyInputMonitorBufferToFeeder START");
 
-        //��һֱҪ��д�ĺ��棬���ܻ�ûд����λ�ã��Ϳ�ʼ��
+        ////读一直要在写的后面，不能还没写到那位置，就开始读
         int latency = (m_currentWritePositionInFrames + m_bufferSizeFrames - m_currentReadPositionInFrames) % m_bufferSizeFrames;
 
         if (i_bufferSizeFrames > latency)

@@ -17,8 +17,10 @@
 #include "../PortDefs.h"
 #include "test.h"
 #include "WavFile.h"
+#include "USBControl.h"
 
 extern sem_t sem;
+extern sem_t sem1;
 
 int fd = 0;
 
@@ -92,30 +94,32 @@ int PlayControl::init(int sampleRate, int outChans, int inChans,
 			return CONTROL_FAIL + 5;
 		}
 	}
-	LOGI("Created OPENSL_STREAM(%d, %d, %d, %d)", sampleRate, inputChannels, outputChannels, callbackBufferFrames);
-	LOGI("numBuffers: %d", INPUT_BUFFERS);
+	wxLogDebugMain("Created PLAYCONTRL(%d, %d, %d, %d)", sampleRate, inputChannels, outputChannels, callbackBufferFrames);
+	wxLogDebugMain("Created PLAYCONTRL(inputFrame=%d, outputframe=%d, callbackBufferFrames=%d)", inputBufferFrames, outputBufferFrames, callbackBufferFrames);
+	wxLogDebugMain("numBuffers: %d", INPUT_BUFFERS);
 	return CONTROL_SUCCESS;
 }
 
-bool PlayControl::handlePlayData(void *pBuffer, int byte_size) { //size : 3840
+void PlayControl::handlePlayData(void *pBuffer, int byte_size) { //size : 3840
 //	writedizeng(pBuffer, byte_size/4);//双声道
 	if(false == m_wavFile->readWavFile(pBuffer, byte_size)){
 		isRunning = 0;
-		wxLogDebugMain("Play Stop ");
+//		wxLogDebugMain("Play Stop ");
 	}
-	return true;
 }
 
-Myresult PlayControl::handleRecData(const void *pBuffer, int size) { //size : 3840
-	int *p = (int*) pBuffer;
-	for (int temp = 0; temp < size; temp++) {
-		if (*(p + temp)) {
-//			panduandizeng(pBuffer, size / 4);
+void PlayControl::handleRecData(void *pBuffer, int byte_size) { //size : 3840
+//	int *p = (int*) pBuffer;
+//	for (int temp = 0; temp < byte_size; temp++) {//打印前几个数据
+//		if (*(p + temp)) {
 //			dayinqianjige(pBuffer);
-			return 0;
-		}
+//			return 0;
+//		}
+//	}
+//	panduandizeng(pBuffer, byte_size / 4);
+	if(false == m_wavFile->writeWavFile(pBuffer, byte_size)){
+		isRunning = 0;
 	}
-	return 0;
 }
 
 int PlayControl::nextIndex(int index, int increment) {
@@ -125,9 +129,8 @@ int PlayControl::nextIndex(int index, int increment) {
 void* PlayMethod(void *context) {
 	PlayControl *p = (PlayControl *) context;
 
-	//Waiting for the initialization of variables p
 	usleep(100);
-	while (p->isRunning != 0) {
+	while (p->isRunning) {
 //		wxLogDebugMain("PlayMethod");
 		p->handlePlayData(p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels,
 				p->callbackBufferFrames * p->outputChannels * sizeof(short));
@@ -139,29 +142,29 @@ void* PlayMethod(void *context) {
 		sem_wait(&sem);
 //		usleep(20000);
 	}
-//	close(fd);
-	wxLogDebugMain("exit Play thread");
+	wxLogErrorMain("exit Play thread");
 	return NULL;
 }
 
+/*
+ * inputBufferFrames    2*960
+ * inputChannels        2
+ * callbackBUfferFrames 960
+ */
 void* RecordMethod(void *context) {
 	PlayControl *p = (PlayControl *) context;
 	usleep(100);
-	while (p->isRunning != 0) {
-//    	sem_wait(&sem);
-		usleep(19500);
+	while (p->isRunning) {
+    	sem_wait(&sem1);
 		short *currentinputBuffer = p->inputBuffer+ (p->inputIndex % p->inputBufferFrames) * p->inputChannels;
 		memset(currentinputBuffer, 0,p->callbackBufferFrames * p->inputChannels * sizeof(short));
-
-		// Synthesize audio with empty input when input is not yet availabe.
-		p->callback(context, p->sampleRate, p->callbackBufferFrames,
-				0, NULL, p->inputChannels,currentinputBuffer);
+		//    	wxLogDebugMain("inputBufferFrames=%d inputChannels=%d callbackBUfferFrames=%d", p->inputBufferFrames, p->inputChannels,p->callbackBufferFrames);
+		p->callback(p->context, p->sampleRate, p->callbackBufferFrames, 0, NULL, p->inputChannels,currentinputBuffer);
 
 		p->handleRecData(currentinputBuffer,p->callbackBufferFrames * p->inputChannels * sizeof(short));
 		p->inputIndex = p->nextIndex(p->inputIndex, p->callbackBufferFrames);
 	}
-//	close(fd);
-	wxLogDebugMain("exit Rec thread");
+	wxLogErrorMain("exit Rec thread");
 	return NULL;
 }
 
@@ -170,6 +173,7 @@ Myresult PlayControl::openPlayThread() {
 	pthread_t id;
 	int ret = 0;
 	ret = pthread_create(&id, NULL, PlayMethod, this);
+//	pthread_join(id, NULL);
 	if (ret != 0) {
 		wxLogDebugMain("can't create thread");
 	} else {
@@ -182,6 +186,7 @@ Myresult PlayControl::openRecThread() {
 
 	pthread_t id;
 	int ret = pthread_create(&id, NULL, RecordMethod, this);
+//	pthread_join(id, NULL);
 	if (ret != 0) {
 		wxLogDebugMain("can't create thread");
 	} else {
@@ -194,6 +199,9 @@ int PlayControl::is_running() {
 	return isRunning;
 }
 
+/*
+ * 打开录音、放音线程
+ */
 int PlayControl::start() {
 	if (isRunning) {
 		return CONTROL_FAIL; // Already running.
@@ -250,7 +258,7 @@ void PlayControl::pause() {
 	// TODO: Determine whether this can actually happen and handle it in a way
 	// that's provably correct.
 	usleep(100000);
-	wxLogDebugMain("opensl_pause usleep complete");
+	wxLogDebugMain("playControl usleep complete");
 }
 
 void PlayControl::stop() {
@@ -272,7 +280,7 @@ void PlayControl::stop() {
 	// TODO: Determine whether this can actually happen and handle it in a way
 	// that's provably correct.
 
-	m_wavFile->closePlayFile();
+	m_wavFile->closeAllFile();
 
 	usleep(100000);
 	wxLogDebugMain("opensl_pause usleep complete");
@@ -281,4 +289,9 @@ void PlayControl::stop() {
 void PlayControl::openPlayFile(const char* wavFileName/*, int size*/){
 	m_wavFile->setReadWavFileName(wavFileName);
 	m_wavFile->prepareReadWavFile();
+}
+
+void PlayControl::openRecFile(const char* wavFileName){
+	m_wavFile->setWriteWavFileName(wavFileName);
+	m_wavFile->prepareWriteWavFile();
 }

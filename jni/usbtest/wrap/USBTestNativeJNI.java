@@ -17,7 +17,7 @@ public class USBTestNativeJNI {
   public final static native boolean USBControl_initUSBDevice(long jarg1, USBControl jarg1_, int jarg2, int jarg3, int jarg4);
   public final static native String USBControl_getOpenDeviceErrorMessage(long jarg1, USBControl jarg1_);
   public final static native boolean USBControl_isAudioDevicePresentForLinux(long jarg1, USBControl jarg1_);
-  public final static native boolean USBControl_startUSBTransfers(long jarg1, USBControl jarg1_, boolean jarg2, String playName, boolean jarg3, int jarg4, boolean jarg5, int jarg6, int jarg7);
+  public final static native boolean USBControl_startUSBTransfers(long jarg1, USBControl jarg1_, boolean jarg2, String playName, boolean jarg3, String recName, int jarg4, boolean jarg5, int jarg6, int jarg7);
   public final static native void USBControl_stopUSBTransfers(long jarg1, USBControl jarg1_);
   public final static native void USBControl_setUSBSampleRate(long jarg1, USBControl jarg1_, int jarg2);
   public final static native boolean USBControl_startOpenSLES(long jarg1, USBControl jarg1_, boolean jarg2, boolean jarg3, int jarg4, int jarg5, int jarg6);

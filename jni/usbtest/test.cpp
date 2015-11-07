@@ -41,7 +41,11 @@ void writedizeng( void *o_output, int i_frameCount) {
               *s_temp = *(s_temp + 1) = g_data++;
 }
 
-
+/*
+ * 判断递增双通道数据
+ * output:需要写入的buffer
+ * i_frameCount 帧数（默认为双声道）
+ */
 void panduandizeng(const void* i_input, int i_frameCount){
         short s1, s2;
         int count = 0;
@@ -59,10 +63,16 @@ void panduandizeng(const void* i_input, int i_frameCount){
 //       }
 }
 
+/*
+ * 打印给定buffer的双声道音频数据
+ */
 void dayinqianjige(const void* i_input){
 	wxLogDebugMain( "%x, %x, %x， %x", *(short*)i_input, *(short*)((int*)i_input + 1), *(short*)((int*)i_input + 2),*(short*)((int*)i_input + 3));
 }
 
+/*
+ * 打印给定的buffer 每行16个
+ */
 void printBuffer_Byte(const void* i_input, int size){
 	int i;
 	for(i = 0; i < 16*(size/16); i+=16){//只打印16的整数倍

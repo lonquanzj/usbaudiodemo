@@ -63,8 +63,8 @@ public class USBControl {
     return USBTestNativeJNI.USBControl_isAudioDevicePresentForLinux(swigCPtr, this);
   }
 
-  public boolean startUSBTransfers(boolean i_playAudio, String playWavName, boolean i_recordAudio, int i_sampleRate, boolean i_force1PPT, int i_bufferSizeInFrames, int i_openSLESBufferSizeInFrames) {
-    return USBTestNativeJNI.USBControl_startUSBTransfers(swigCPtr, this, i_playAudio, playWavName, i_recordAudio, i_sampleRate, i_force1PPT, i_bufferSizeInFrames, i_openSLESBufferSizeInFrames);
+  public boolean startUSBTransfers(boolean i_playAudio, String playWavName, boolean i_recordAudio, String recWavName, int i_sampleRate, boolean i_force1PPT, int i_bufferSizeInFrames, int i_openSLESBufferSizeInFrames) {
+    return USBTestNativeJNI.USBControl_startUSBTransfers(swigCPtr, this, i_playAudio, playWavName, i_recordAudio,recWavName, i_sampleRate, i_force1PPT, i_bufferSizeInFrames, i_openSLESBufferSizeInFrames);
   }
 
   public void stopUSBTransfers() {

@@ -33,14 +33,13 @@ public:
 	int prepareReadWavFile();
 	int prepareWriteWavFile();
 
-	void closeRecFile();
-	void closePlayFile();
+	void closeAllFile();
 
 	void getWavHead();
 	void setWavHead();
 
-	bool readWavFile(void *inputPuffer, int inFramesize);
-	bool writeWavFile(void *outputBuffer, int outFramesize);
+	bool readWavFile(void *buffer, int inFramesize);
+	bool writeWavFile(void *buffer, int outFramesize);
 
 	int mixWavFile();//合成录音+伴奏
 

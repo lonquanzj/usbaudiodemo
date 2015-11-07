@@ -16,6 +16,7 @@ public class MusicApp extends Application {
 	public static String lrcPath = "/lrc";
 	public static String musicPath = "/musicFiles";
 	public static String recPath = "/recFiles";
+	public static String recFileName = null;
 	public static String logFileName = null;
 	public static String mCurrFileName = null;
 	public static final String TAG = "MyUSBAdio";
@@ -51,5 +52,6 @@ public class MusicApp extends Application {
 		}
 		
 		logFileName = new String(rootPath + "/USBTester.txt");
+		recFileName = new String(musicPath + "/record.wav");
 	}
 }

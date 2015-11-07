@@ -25,7 +25,6 @@ import android.widget.Toast;
 
 import com.ccm.usbaudiodemo.MusicApp;
 import com.ccm.usbaudiodemo.R;
-import com.ccm.usbaudiodemo.usbcontrol.AudioSystemParams;
 import com.ccm.usbaudiodemo.usbcontrol.USBControl;
 import com.ccm.usbaudiodemo.usbcontrol.USBDeviceManager;
 
@@ -34,7 +33,7 @@ public class MainActivity extends Activity {
 	
 	public static final int UPDATE_LOG = 1;
 	
-    final static int s_defaultOpenSLESBufferSizeInFrames = 1024;
+    final static int s_defaultOpenSLESBufferSizeInFrames = 960;
     final static int s_defaultUSBBufferSizeInFrames = 4096;
     final static int s_defaultSampleRate = 48000;
 	
@@ -53,6 +52,8 @@ public class MainActivity extends Activity {
 	private static TextView mTvTile;//标题文本
 	private StringBuffer mLog = new StringBuffer();
 	private myOnClickListener mClickListner;
+	
+	private boolean mIsRecStat = false;//判断是否是录音->停止
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,11 +122,11 @@ public class MainActivity extends Activity {
         return false;
     }
     
-    private void play(boolean i_play,String playWavName, boolean i_record)
+    private void play(boolean i_play,String playWavName, boolean i_record,String recWavName)
     {
-        int openSLESBufferSize = getOpenSLESBufferSize(s_defaultSampleRate);
+//        int openSLESBufferSize = getOpenSLESBufferSize(s_defaultSampleRate);
         
-        m_usbControl.startUSBTransfers(i_play, playWavName, i_record, s_defaultSampleRate, false, s_defaultUSBBufferSizeInFrames, openSLESBufferSize);
+        m_usbControl.startUSBTransfers(i_play, playWavName, i_record, recWavName, s_defaultSampleRate, false, s_defaultUSBBufferSizeInFrames, s_defaultOpenSLESBufferSizeInFrames);
     }
     
     
@@ -135,33 +136,33 @@ public class MainActivity extends Activity {
     }
     
     
-    private int getOpenSLESBufferSize(int i_requestedSampleRate)
-    {
-        if (Build.VERSION.SDK_INT >= 17)
-        {
-            try
-            {
-                AudioSystemParams parms = AudioSystemParams.createInstance(this);
-                
-                Log.v("Main", "Native sample rate: " + Integer.toString(parms.getSampleRate()));
-                Log.v("Main", "Native buffer size: " + Integer.toString(parms.getBufferSize()));
-                
-                if (parms.getSampleRate() == i_requestedSampleRate)
-                {
-                    if (parms.getBufferSize() > 0)
-                    {
-                        return parms.getBufferSize();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        
-        return s_defaultOpenSLESBufferSizeInFrames;
-    }
+//    private int getOpenSLESBufferSize(int i_requestedSampleRate)
+//    {
+//        if (Build.VERSION.SDK_INT >= 17)
+//        {
+//            try
+//            {
+//                AudioSystemParams parms = AudioSystemParams.createInstance(this);
+//                
+//                Log.v("Main", "Native sample rate: " + Integer.toString(parms.getSampleRate()));
+//                Log.v("Main", "Native buffer size: " + Integer.toString(parms.getBufferSize()));
+//                
+//                if (parms.getSampleRate() == i_requestedSampleRate)
+//                {
+//                    if (parms.getBufferSize() > 0)
+//                    {
+//                        return parms.getBufferSize();
+//                    }
+//                }
+//            }
+//            catch (Exception e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
+//        
+//        return s_defaultOpenSLESBufferSizeInFrames;
+//    }
     
     static class MyHandler extends Handler
     {
@@ -268,6 +269,14 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 				break;
 			case R.id.btn_record://录音
+				if(mIsConnectDev){
+					play(false, null , true, MusicApp.recFileName);
+					mBtn_play.setVisibility(View.INVISIBLE);
+					mIsRecStat = true;
+					sendMsgAppendLog("开始录音");
+				}else{
+					sendMsgAppendLog("设备未连接");
+				}
 				break;
 			case R.id.btn_play://放音
 				if(MusicApp.mCurrFileName == null){
@@ -275,8 +284,9 @@ public class MainActivity extends Activity {
 					break;
 				}
 				if(mIsConnectDev){
-					play(true, MusicApp.mCurrFileName, false);
+					play(true, MusicApp.mCurrFileName, false, null);
 					sendMsgAppendLog("开始播放");
+					mBtn_rec.setVisibility(View.INVISIBLE);
 				}else{
 					sendMsgAppendLog("设备未连接");
 				}
@@ -285,6 +295,12 @@ public class MainActivity extends Activity {
 				if(mIsConnectDev){
 					stopClicked();
 					sendMsgAppendLog("停止");
+					mBtn_play.setVisibility(View.VISIBLE);
+					mBtn_rec.setVisibility(View.VISIBLE);
+					if(mIsRecStat){//设置录音文件为默认打开的文件
+						setChooseFile("record");
+					}
+					mIsRecStat = false;
 				}else{
 					sendMsgAppendLog("设备未连接");
 				}

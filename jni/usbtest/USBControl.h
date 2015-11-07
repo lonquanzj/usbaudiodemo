@@ -76,6 +76,7 @@ public:
     bool startUSBTransfers(bool i_playAudio,
     					   const char *playFileName,
                            bool i_recordAudio,
+						   const char *recFileName,
                            int i_sampleRate,
                            bool i_force1PPT,
                            int i_bufferSizeInFrames,
@@ -103,9 +104,12 @@ public:
                        int i_sampleRate,
                        int i_bufferSizeInFrames);
 
-    void stopOpenSLES();
+    void stopPlayCtrol();
+
     void sendMsgByHid();
     void setValue(int type, int index,float value);
+    bool GetPlayStatu();
+    bool GetRecStatu();
 
 private:
     /**
@@ -146,7 +150,7 @@ private:
                                USBAudioStreamConfig * i_streamConfig,
                                void *i_userData);
 
-    static void musicCtrlCallback(void *context, int sample_rate, int buffer_frames,
+    static void playCtrlCallback(void *context, int sample_rate, int buffer_frames,
             int output_channels, short *output_buffer,
             int input_channels, short *input_buffer);
 
@@ -158,8 +162,8 @@ private:
     // OpenSLES stream for recording from the mic and playing through the earpiece
     PlayControl *m_playControl;
 
-    InputMonitorBuffer *m_bufferFromOpenSLESToUSB;
-    InputMonitorBuffer *m_bufferFromUSBToOpenSLES;
+    InputMonitorBuffer *m_bufferFromHostToUSB;
+    InputMonitorBuffer *m_bufferFromUSBToHost;
 //    short *m_monoToStereoConvertBuffer1;
     short *m_monoToStereoConvertBuffer2;
 

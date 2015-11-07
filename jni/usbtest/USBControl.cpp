@@ -12,6 +12,7 @@
 #include "PlayControl.h"
 
 sem_t sem;
+sem_t sem1;
 
 USBControl::USBControl()
 {
@@ -20,8 +21,8 @@ USBControl::USBControl()
     m_playing = false;
     m_recording = false;
 
-    m_bufferFromOpenSLESToUSB = new InputMonitorBuffer(65536, 2);
-    m_bufferFromUSBToOpenSLES = new InputMonitorBuffer(65536, 2);
+    m_bufferFromHostToUSB = new InputMonitorBuffer(65536, 2);
+    m_bufferFromUSBToHost = new InputMonitorBuffer(65536, 2);
 //    m_monoToStereoConvertBuffer1 = NULL;
     m_monoToStereoConvertBuffer2 = NULL;
     m_tempBuffer = NULL;
@@ -31,6 +32,7 @@ USBControl::USBControl()
 
     setLogMethod(2);
     sem_init(&sem, 0, 1);
+    sem_init(&sem1, 0, 1);
 }
 
 
@@ -68,16 +70,16 @@ void USBControl::cleanUp()
 		m_USBAudioManager = NULL;
 	}
 
-    if (m_bufferFromOpenSLESToUSB)
+    if (m_bufferFromHostToUSB)
     {
-        delete m_bufferFromOpenSLESToUSB;
-        m_bufferFromOpenSLESToUSB = NULL;
+        delete m_bufferFromHostToUSB;
+        m_bufferFromHostToUSB = NULL;
     }
 
-    if (m_bufferFromUSBToOpenSLES)
+    if (m_bufferFromUSBToHost)
     {
-        delete m_bufferFromUSBToOpenSLES;
-        m_bufferFromUSBToOpenSLES = NULL;
+        delete m_bufferFromUSBToHost;
+        m_bufferFromUSBToHost = NULL;
     }
 
     if (m_tempBuffer != NULL)
@@ -160,8 +162,8 @@ wxString USBControl::getOpenDeviceErrorMessage()
     }
 }
 
-
-int g_data1 = 0;
+int g_data_play = 0;
+int g_data_rec = 0;
 
 bool USBControl::playCallback(void *o_output,
                               unsigned int i_frameCount,
@@ -171,10 +173,8 @@ bool USBControl::playCallback(void *o_output,
                               bool i_fillSilence,
                               unsigned int& o_frameCount)
 {
-	if (++g_data1 % 10 == 0)
-		sem_post(&sem);
     USBControl *usbControl = (USBControl *) i_userData;
-    InputMonitorBuffer* inputMonitorBuffer = usbControl->m_bufferFromOpenSLESToUSB;
+    InputMonitorBuffer* inputMonitorBuffer = usbControl->m_bufferFromHostToUSB;
 //    if (usbControl->m_playing && usbControl->m_recording) // route USB input to output, use USB recording buffer
 //    {
 //        inputMonitorBuffer = usbControl->m_bufferFromUSBToOpenSLES;
@@ -197,6 +197,9 @@ bool USBControl::playCallback(void *o_output,
                 inputMonitorBuffer->copyFromBuffer((short *) o_output, i_frameCount);
 //              wxLogErrorMain("fread wav file : fd %d, count %d, size %d", *(short*)o_output, *(short*)((short*)o_output + 2), *(short*)((short*)o_output + 4));
 //              panduandizeng(o_output, i_frameCount);
+
+            	if (++g_data_play % 10 == 0) sem_post(&sem);
+
             }
             else if (i_streamConfig->getUSBAltSetting()->getBitResolution() == 24) // convert from 16 to 24 bit
             {
@@ -247,8 +250,7 @@ bool USBControl::recordCallback(const void *i_input,
     USBControl *usbControl = (USBControl *) i_userData;
 
 //    wxLogDebugMain("USB rec cb!");
-
-    if (usbControl->m_recording && i_input && usbControl->m_bufferFromUSBToOpenSLES)
+    if (usbControl->m_recording && i_input && usbControl->m_bufferFromUSBToHost)
     {
         if (i_streamConfig->getUSBAltSetting()->getNumberOfChannels() == 1) // convert from mono to stereo
         {
@@ -264,14 +266,17 @@ bool USBControl::recordCallback(const void *i_input,
                     monoToStereoConvertBuffer[i * 2 + 1] = inputBuffer[i];
                 }
 
-                usbControl->m_bufferFromUSBToOpenSLES->copyToBuffer(monoToStereoConvertBuffer, i_frameCount);
+                usbControl->m_bufferFromUSBToHost->copyToBuffer(monoToStereoConvertBuffer, i_frameCount);
             }
         }
         else
         {
             if (i_streamConfig->getUSBAltSetting()->getBitResolution() == 16) // directly copy
             {
-                usbControl->m_bufferFromUSBToOpenSLES->copyToBuffer((short *) i_input, i_frameCount);
+                usbControl->m_bufferFromUSBToHost->copyToBuffer((short *) i_input, i_frameCount);
+//                dayinqianjige(i_input);
+            	if (++g_data_rec % 10 == 0)  sem_post(&sem1);
+
             }
         }
         return true;
@@ -284,6 +289,7 @@ bool USBControl::recordCallback(const void *i_input,
 bool USBControl::startUSBTransfers(bool i_playAudio,
 								   const char *playFileName,
                                    bool i_recordAudio,
+								   const char *recFileName,
                                    int i_sampleRate,
                                    bool i_force1PPT,
                                    int i_bufferSizeInFrames,
@@ -296,15 +302,15 @@ bool USBControl::startUSBTransfers(bool i_playAudio,
         return false;
     }*/
 
-    wxLogDebugMain("StartUSBTransfers ");
+    wxLogDebugMain("StartUSBTransfers i_openSLESBufferSizeInFrames = %d", i_openSLESBufferSizeInFrames);
 
     USBAudioDevice *audioDevice = m_USBAudioManager->getCurrentAudioDevice();
     std::vector<IVolumeController *> tIVolumeController;
 
     if (m_USBAudioManager && audioDevice)
     {
-        m_bufferFromOpenSLESToUSB->clearBuffer();
-        m_bufferFromUSBToOpenSLES->clearBuffer();
+        m_bufferFromHostToUSB->clearBuffer();
+        m_bufferFromUSBToHost->clearBuffer();
 
         //wxLogDebugMain("device = %p", device);
         audioDevice->setPlayCallback(playCallback, this);
@@ -336,6 +342,7 @@ bool USBControl::startUSBTransfers(bool i_playAudio,
         if (i_recordAudio)
         {
             wxLogDebugMain("PREPARE RECORD");
+            m_playControl->openRecFile(recFileName);
 
             if (recordStreamConfig == NULL)
             {
@@ -373,7 +380,7 @@ bool USBControl::startUSBTransfers(bool i_playAudio,
 		m_tempBuffer = new short[i_bufferSizeInFrames * 2];
 
 		wxLogDebugMain("Starting PlayContrl");
-		if (startMusicCtrl(i_playAudio, i_recordAudio , 1, i_sampleRate, i_openSLESBufferSizeInFrames)) {
+		if (startMusicCtrl(i_playAudio, i_recordAudio , 2, i_sampleRate, i_openSLESBufferSizeInFrames)) {
 			if (i_playAudio) {
 				m_playing = true;
 			}
@@ -424,7 +431,7 @@ void USBControl::stopUSBTransfers()
         }
     }
 
-    stopOpenSLES();
+    stopPlayCtrol();
 
     if (m_monoToStereoConvertBuffer2 != NULL)
     {
@@ -453,7 +460,7 @@ void USBControl::setUSBSampleRate(int i_sampleRate)
 }
 
 
-void USBControl::musicCtrlCallback(void *context, int sample_rate, int buffer_frames,
+void USBControl::playCtrlCallback(void *context, int sample_rate, int buffer_frames,
                                 int output_channels, short *output_buffer,
                                 int input_channels, short *input_buffer)
 {
@@ -465,20 +472,17 @@ void USBControl::musicCtrlCallback(void *context, int sample_rate, int buffer_fr
     if (output_channels > 0 && output_buffer)
     {
 //        wxLogDebugMain("PUT! %d frames", buffer_frames);
-            usbControl->m_bufferFromOpenSLESToUSB->copyToBuffer(output_buffer, buffer_frames);
-//            if(!usbControl->m_bufferFromOpenSLESToUSB->CheckLatency(96)){
-//        		usleep(4000);
-//        	}
-//        }
+          usbControl->m_bufferFromHostToUSB->copyToBuffer(output_buffer, buffer_frames);
     }
 
     // then Rec part
-    if (input_channels > 0 && input_buffer && usbControl->m_bufferFromUSBToOpenSLES)
+//    wxLogDebugMain("buffer_frames=%d input_channels=%d input_buffer=%p usbControl->m_bufferFromUSBToHost=%p", buffer_frames,input_channels,input_buffer,usbControl->m_bufferFromUSBToHost);
+    if (input_channels > 0 && input_buffer && usbControl->m_bufferFromUSBToHost)
     {
-//        wxLogDebugMain("OUTPUT OpenSLES! %d frames", buffer_frames);
-        if (usbControl->m_bufferFromUSBToOpenSLES->getFramesWritten() >= buffer_frames)
+//        wxLogDebugMain("INPUT PLAYCONTROL!getFramesWritten= %d buffer_frames=%d",usbControl->m_bufferFromUSBToHost->getFramesWritten(), buffer_frames);
+        if (usbControl->m_bufferFromUSBToHost->getFramesWritten() >= buffer_frames)
         {
-            usbControl->m_bufferFromUSBToOpenSLES->copyFromBuffer(input_buffer, buffer_frames);
+            usbControl->m_bufferFromUSBToHost->copyFromBuffer(input_buffer, buffer_frames);
         }
     }
 }
@@ -492,9 +496,9 @@ bool USBControl::startMusicCtrl(bool i_play,
 {
 	int Myresult = m_playControl->init(i_sampleRate,
 			i_play ? 2 : 0,
-			i_record ? 1 : 0,
+			i_record ? 2 : 0,
 			i_bufferSizeInFrames,
-			musicCtrlCallback,
+			playCtrlCallback,
 			this);
 
     if (Myresult != CONTROL_SUCCESS)
@@ -523,7 +527,7 @@ bool USBControl::startMusicCtrl(bool i_play,
 }
 
 
-void USBControl::stopOpenSLES()
+void USBControl::stopPlayCtrol()
 {
     m_playControl->stop();
 }
@@ -551,11 +555,11 @@ int USBControl::checkWriteReadPosition()
 {
    int ret;
    int write_ptr,read_ptr;
-   write_ptr=m_bufferFromOpenSLESToUSB->getWritePosition();
-   read_ptr=m_bufferFromOpenSLESToUSB->getReadPosition();
+   write_ptr=m_bufferFromHostToUSB->getWritePosition();
+   read_ptr=m_bufferFromHostToUSB->getReadPosition();
    if(write_ptr>=read_ptr)
    {
-	   if((write_ptr + 960 < m_bufferFromOpenSLESToUSB->getBufferFrameSize())&&(DelayCopyFlag==0))
+	   if((write_ptr + 960 < m_bufferFromHostToUSB->getBufferFrameSize())&&(DelayCopyFlag==0))
 	   {
 		  DelayCounter=0;
           ret=COPY_EN;
@@ -579,4 +583,12 @@ int USBControl::checkWriteReadPosition()
    }
    return ret;
 
+}
+
+bool USBControl::GetPlayStatu(){
+	return m_playing;
+}
+
+bool USBControl::GetRecStatu(){
+	return m_recording;
 }
