@@ -11,21 +11,12 @@
 #include <WavFile.h>
 #include "PortDefs.h"
 
-//WavFile::WavFile(){
-//	m_winfo = new WAVEFORMATEX;
-////	m_currentReadPositionInFlie += 22;//跳过wav文件头
-//	totalAudioLen = 0;
-//	setRecWavHead();//还不确定数据长度，先初始化再说
-//}
-
-WavFile::WavFile(char *playFileName, char *recFileName = NULL) {
-	m_recFileName = recFileName;
-	m_playFileName = playFileName;
-
+WavFile::WavFile(/*char *playFileName*//*, char *recFileName = NULL*/) {
+	memset(m_recFileName, 0, sizeof(m_recFileName));
+	memset(m_playFileName, 0, sizeof(m_playFileName));
 	m_winfo = new WAVEFORMATEX;
 //	m_currentReadPositionInFlie += 22;//跳过wav文件头
 	totalAudioLen = 0;
-	setRecWavHead();//还不确定数据长度，先初始化再说
 }
 
 WavFile::~WavFile() {
@@ -33,45 +24,59 @@ WavFile::~WavFile() {
 	delete []m_winfo;
 }
 
-
-bool WavFile::openPlayWavFile(){
-	if((m_handlePlayWavFile = open(m_playFileName, O_RDONLY)) == -1){
-		wxLogFuckMain("Open MusicFile Fail ..!");
-		return false;
-	}
-	wxLogFuckMain("Open Music File Succeed ..!");
-	get_wav_info();
-	if (m_winfo->wBitsPerSample!=16)//2byte
-	{
-		close(m_handlePlayWavFile);
-		wxLogFuckMain("No 16bit music file !");
-		return false;
-	}
-
-	return true;
+void WavFile::setReadWavFileName(const char* name/*, int len*/){
+	strcpy(m_playFileName, name);
 }
 
+void WavFile::setWriteWavFileName(const char* name){
+	strcpy(m_recFileName, name);
+}
 
+int WavFile::prepareReadWavFile(){
+	wxLogFuckMain("prepareReadWavFile");
+	if(m_playFileName[0] == 0){
+			return 1;
+		}
 
-int WavFile::mixWavFile(){//合成录音+伴奏
+	if((m_handlePlayWavFile = open(m_playFileName, O_RDONLY)) == -1){
+		wxLogFuckMain("Open MusicFile Fail ..!");
+		return 2;
+	}
+	wxLogFuckMain("Open Music File Succeed ..!");
+
+	getWavHead();
+
+//	if (m_winfo->wBitsPerSample!=16)//2byte
+//	{
+//		close(m_handlePlayWavFile);
+//		wxLogFuckMain("No 16bit music file !");
+//		return 3;
+//	}
+
 	return 0;
 }
 
-
-bool WavFile::createRecFile(){
-    //ad by zj
+int WavFile::prepareWriteWavFile(){
+	if(m_recFileName[0] == 0){
+		return 1;
+	}
+	//打开录音文件
     if(-1 == (m_handleRecWavFile = open(m_recFileName, O_CREAT|O_RDWR|O_TRUNC, 0777))){
     		wxLogFuckMain("Open Rec File Faild!");
     	}else{
     		write(m_handleRecWavFile, wavHead, sizeof(wavHead));
     		wxLogFuckMain("Open Rec File Seccess!");
     	}
+
+	setWavHead();//还不确定数据长度，先初始化再说
+
+	return 0;
 }
 
 
-bool WavFile::dealRecDataCallback(void *outputBuffer, int size){
+bool WavFile::writeWavFile(void *outputBuffer, int size){
 
-//	wxLogFuckMain("dealRecDataCallback");
+	wxLogFuckMain("writeWavFile");
 	/*int len;
 	if((len == write(m_handleRecWavFile, outputBuffer, size))  == -1){
 		wxLogFuckMain("Write Rec File Fail!");
@@ -80,19 +85,18 @@ bool WavFile::dealRecDataCallback(void *outputBuffer, int size){
 	return true;
 }
 
-bool WavFile::dealPlayDataCallback(void *inputBuffer, int size){
-//	wxLogFuckMain("dealPlayDataCallback");
-	/*int len;
+bool WavFile::readWavFile(void *inputBuffer, int size){
+//	wxLogFuckMain("readWavFile");
+	int len = 0;
 	if((len == read(m_handlePlayWavFile, inputBuffer, size)) == -1){
 		wxLogFuckMain("Read Music File Fail!");
 		return false;
-	}*/
+	}
 	return true;
 }
 
-
 void WavFile::closeRecFile(){
-	setRecWavHead();
+	setWavHead();
 	close(m_handleRecWavFile);
 }
 
@@ -101,13 +105,12 @@ void WavFile::closePlayFile(){
 	close(m_handlePlayWavFile);
 }
 
-void WavFile::setRecWavHead(){
+void WavFile::setWavHead(){
 
 	long fileCurrPos = lseek(m_handleRecWavFile, 0, SEEK_CUR);//获取文件指针当恰偏移量
 	if(fileCurrPos > 44){
 		totalAudioLen = fileCurrPos - 44;
 	}
-
 
 	long totalDataLen = totalAudioLen + 44 - 8;
 	int channels = 2;//通道数
@@ -189,14 +192,16 @@ void WavFile::setRecWavHead(){
 	write(m_handleRecWavFile, wavHead, sizeof(wavHead));
 }
 
-void WavFile::get_wav_info()
+void WavFile::getWavHead()
 {
 	char buff[44];
 	memset((char *)m_winfo, 0, sizeof( WAVEFORMATEX));
-	m_handlePlayWavFile = open(m_playFileName, O_RDONLY);
-	if (read(m_handlePlayWavFile, (char*)buff, 0x2c)==0) return;
+	if (read(m_handlePlayWavFile, (char*)buff, 0x2c)==0) {
+		wxLogFuckMain("Read Wav Head Faild");
+		return;
+	}
 
-	if (strncmp("WAVEfmt", (char *)buff + 8, 7) != 0 )
+	if (strncmp("WAVE", (char *)buff + 8, 4) != 0 )
 	{//非wav格式咱不理他
 		close(m_handlePlayWavFile);
 		wxLogFuckMain("Not Wav File !");
@@ -213,5 +218,9 @@ void WavFile::get_wav_info()
 	m_winfo->cbSize  			= *(int *)(buff+0x28);
 
 	m_fileSizeFrames = m_winfo->cbSize / (sizeof(short) * 2);
+}
+
+int WavFile::mixWavFile(){//合成录音+伴奏
+	return 0;
 }
 

@@ -121,11 +121,11 @@ public class MainActivity extends Activity {
         return false;
     }
     
-    private void play(boolean i_play, boolean i_record)
+    private void play(boolean i_play,String playWavName, boolean i_record)
     {
         int openSLESBufferSize = getOpenSLESBufferSize(s_defaultSampleRate);
         
-        m_usbControl.startUSBTransfers(i_play, i_record, s_defaultSampleRate, false, s_defaultUSBBufferSizeInFrames, openSLESBufferSize);
+        m_usbControl.startUSBTransfers(i_play, playWavName, i_record, s_defaultSampleRate, false, s_defaultUSBBufferSizeInFrames, openSLESBufferSize);
     }
     
     
@@ -270,8 +270,13 @@ public class MainActivity extends Activity {
 			case R.id.btn_record://录音
 				break;
 			case R.id.btn_play://放音
+				if(MusicApp.mCurrFileName == null){
+					sendMsgAppendLog("文件为空");
+					break;
+				}
 				if(mIsConnectDev){
-					play(true, false);
+					play(true, MusicApp.mCurrFileName, false);
+					sendMsgAppendLog("开始播放");
 				}else{
 					sendMsgAppendLog("设备未连接");
 				}

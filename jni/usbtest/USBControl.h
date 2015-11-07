@@ -74,6 +74,7 @@ public:
      *        For example, a stereo stream at 44100Hz has 44100 frames per second, each frame consisting of 2 samples.
      */
     bool startUSBTransfers(bool i_playAudio,
+    					   const char *playFileName,
                            bool i_recordAudio,
                            int i_sampleRate,
                            bool i_force1PPT,

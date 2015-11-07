@@ -19,7 +19,6 @@ USBControl::USBControl()
     m_USBAudioManager = NULL;
     m_playing = false;
     m_recording = false;
-    m_playControl = NULL;
 
     m_bufferFromOpenSLESToUSB = new InputMonitorBuffer(65536, 2);
     m_bufferFromUSBToOpenSLES = new InputMonitorBuffer(65536, 2);
@@ -28,6 +27,7 @@ USBControl::USBControl()
     m_tempBuffer = NULL;
 
     m_HIDTransfer = NULL;
+    m_playControl = NULL;
 
     setLogMethod(2);
     sem_init(&sem, 0, 1);
@@ -171,8 +171,8 @@ bool USBControl::playCallback(void *o_output,
                               bool i_fillSilence,
                               unsigned int& o_frameCount)
 {
-//	if (++g_data1 % 10)
-//		sem_post(&sem);
+	if (++g_data1 % 10 == 0)
+		sem_post(&sem);
     USBControl *usbControl = (USBControl *) i_userData;
     InputMonitorBuffer* inputMonitorBuffer = usbControl->m_bufferFromOpenSLESToUSB;
 //    if (usbControl->m_playing && usbControl->m_recording) // route USB input to output, use USB recording buffer
@@ -282,6 +282,7 @@ bool USBControl::recordCallback(const void *i_input,
 
 
 bool USBControl::startUSBTransfers(bool i_playAudio,
+								   const char *playFileName,
                                    bool i_recordAudio,
                                    int i_sampleRate,
                                    bool i_force1PPT,
@@ -295,7 +296,7 @@ bool USBControl::startUSBTransfers(bool i_playAudio,
         return false;
     }*/
 
-    wxLogDebugMain("StartUSBTransfers");
+    wxLogDebugMain("StartUSBTransfers ");
 
     USBAudioDevice *audioDevice = m_USBAudioManager->getCurrentAudioDevice();
     std::vector<IVolumeController *> tIVolumeController;
@@ -316,6 +317,8 @@ bool USBControl::startUSBTransfers(bool i_playAudio,
         m_playing = false;
         if (i_playAudio)
         {
+        	m_playControl->openPlayFile(playFileName);
+
             if (audioDevice->selectOutput(playStreamConfig) == false)
             {
                 wxLogDebugMain("Error selecting output!");
@@ -461,7 +464,7 @@ void USBControl::musicCtrlCallback(void *context, int sample_rate, int buffer_fr
     // First play part
     if (output_channels > 0 && output_buffer)
     {
-        wxLogDebugMain("PUT! %d frames", buffer_frames);
+//        wxLogDebugMain("PUT! %d frames", buffer_frames);
             usbControl->m_bufferFromOpenSLESToUSB->copyToBuffer(output_buffer, buffer_frames);
 //            if(!usbControl->m_bufferFromOpenSLESToUSB->CheckLatency(96)){
 //        		usleep(4000);

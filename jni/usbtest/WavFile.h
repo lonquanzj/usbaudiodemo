@@ -24,27 +24,30 @@ typedef struct tWAVEFORMATEX{
 
 class WavFile {
 public:
-	WavFile(char *playFileName, char *recFileName);
+	WavFile(/*char *playFileName*//*, char *recFileName*/);
 	virtual ~WavFile();
 
+	void setReadWavFileName(const char* name/*, int len*/);
+	void setWriteWavFileName(const char* name/*, int len*/);
 
-	bool createRecFile();
-	void saveToRecFile();
-	void setRecWavHead();
+	int prepareReadWavFile();
+	int prepareWriteWavFile();
+
 	void closeRecFile();
-	bool openPlayWavFile();
 	void closePlayFile();
-//	int readWavFile(short *destBuffer, int i_bufferSizeFrames);//每次读多少个Frame 返回成功的个数
-	int mixWavFile();//合成录音+伴奏
-	void get_wav_info();
 
-	bool dealRecDataCallback(void *outputBuffer, int outFramesize);
-	bool dealPlayDataCallback(void *inputPuffer, int inFramesize);
+	void getWavHead();
+	void setWavHead();
+
+	bool readWavFile(void *inputPuffer, int inFramesize);
+	bool writeWavFile(void *outputBuffer, int outFramesize);
+
+	int mixWavFile();//合成录音+伴奏
 
 private:
 
-	char *m_playFileName;
-	char *m_recFileName;
+	char m_playFileName[100];
+	char m_recFileName[100];
 	int m_handlePlayWavFile;
 	int m_handleRecWavFile;
     long totalAudioLen;

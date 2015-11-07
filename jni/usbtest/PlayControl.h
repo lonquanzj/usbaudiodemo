@@ -29,6 +29,7 @@ class PlayControl{
 public:
   void *context;
   playctrl_process_t callback;
+  class WavFile *m_wavFile;
 
   int sampleRate;
   int inputChannels;
@@ -65,11 +66,13 @@ public:
 
 	Myresult openPlayThread ();
 	Myresult openRecThread ();
-	Myresult handlePlayData(const void *pBuffer,int size);
+	bool handlePlayData(void *pBuffer,int size);
 	Myresult handleRecData(const void *pBuffer,int size);
 //	Myresult myClear();
 
 	int nextIndex(int index, int increment);
+
+	void openPlayFile(const char* wavFileName/*, int size*/);
 
 public:
 	PlayControl();

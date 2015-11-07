@@ -32,6 +32,7 @@ public class MusicApp extends Application {
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			ROOT = Environment.getExternalStorageDirectory().getPath();
 		}
+		Log.d(TAG, "根目录= " + ROOT);
 		rootPath = ROOT + rootPath;
 		lrcPath = rootPath + lrcPath;
 		musicPath = rootPath + musicPath;

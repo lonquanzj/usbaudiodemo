@@ -29,6 +29,7 @@ PlayControl::PlayControl() {
 	inputBuffer = NULL;
 	outputBuffer = NULL;
 //	dummyBuffer = NULL;
+	m_wavFile = new WavFile();
 }
 
 PlayControl::~PlayControl() {
@@ -39,9 +40,14 @@ PlayControl::~PlayControl() {
 	}
 
 	if (inputBuffer) {
-		delete inputBuffer;
+		delete[] inputBuffer;
 		inputBuffer = NULL;
 	}
+
+	if (m_wavFile) {
+		delete[] m_wavFile;
+		m_wavFile = NULL;
+		}
 }
 
 int PlayControl::init(int sampleRate, int outChans, int inChans,
@@ -91,10 +97,13 @@ int PlayControl::init(int sampleRate, int outChans, int inChans,
 	return CONTROL_SUCCESS;
 }
 
-Myresult PlayControl::handlePlayData(const void *pBuffer, int size) { //size : 3840
-	char *ptemp = (char*) pBuffer;
-	writedizeng(ptemp, size/4);
-	return 0;
+bool PlayControl::handlePlayData(void *pBuffer, int byte_size) { //size : 3840
+//	writedizeng(pBuffer, byte_size/4);//双声道
+	if(false == m_wavFile->readWavFile(pBuffer, byte_size)){
+		isRunning = 0;
+		wxLogDebugMain("Play Stop ");
+	}
+	return true;
 }
 
 Myresult PlayControl::handleRecData(const void *pBuffer, int size) { //size : 3840
@@ -127,8 +136,8 @@ void* PlayMethod(void *context) {
 				p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels, 0, NULL);
 
 		p->outputIndex = p->nextIndex(p->outputIndex, p->callbackBufferFrames);
-//		sem_wait(&sem);
-		usleep(2000);
+		sem_wait(&sem);
+//		usleep(20000);
 	}
 //	close(fd);
 	wxLogDebugMain("exit Play thread");
@@ -262,7 +271,14 @@ void PlayControl::stop() {
 	//
 	// TODO: Determine whether this can actually happen and handle it in a way
 	// that's provably correct.
+
+	m_wavFile->closePlayFile();
+
 	usleep(100000);
 	wxLogDebugMain("opensl_pause usleep complete");
 }
 
+void PlayControl::openPlayFile(const char* wavFileName/*, int size*/){
+	m_wavFile->setReadWavFileName(wavFileName);
+	m_wavFile->prepareReadWavFile();
+}

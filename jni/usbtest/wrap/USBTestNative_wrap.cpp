@@ -330,7 +330,7 @@ SWIGEXPORT jboolean JNICALL Java_com_ccm_usbaudiodemo_usbcontrol_USBTestNativeJN
 }
 
 
-SWIGEXPORT jboolean JNICALL Java_com_ccm_usbaudiodemo_usbcontrol_USBTestNativeJNI_USBControl_1startUSBTransfers(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2, jboolean jarg3, jint jarg4, jboolean jarg5, jint jarg6, jint jarg7) {
+SWIGEXPORT jboolean JNICALL Java_com_ccm_usbaudiodemo_usbcontrol_USBTestNativeJNI_USBControl_1startUSBTransfers(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2, jstring playName, jboolean jarg3, jint jarg4, jboolean jarg5, jint jarg6, jint jarg7) {
   jboolean jresult = 0 ;
   USBControl *arg1 = (USBControl *) 0 ;
   bool arg2 ;
@@ -346,12 +346,13 @@ SWIGEXPORT jboolean JNICALL Java_com_ccm_usbaudiodemo_usbcontrol_USBTestNativeJN
   (void)jarg1_;
   arg1 = *(USBControl **)&jarg1; 
   arg2 = jarg2 ? true : false; 
+  const char* name = jenv->GetStringUTFChars(playName, NULL);
   arg3 = jarg3 ? true : false; 
   arg4 = (int)jarg4; 
   arg5 = jarg5 ? true : false; 
   arg6 = (int)jarg6; 
   arg7 = (int)jarg7; 
-  result = (bool)(arg1)->startUSBTransfers(arg2,arg3,arg4,arg5,arg6,arg7);
+  result = (bool)(arg1)->startUSBTransfers(arg2,name,arg3,arg4,arg5,arg6,arg7);
   jresult = (jboolean)result; 
   return jresult;
 }
