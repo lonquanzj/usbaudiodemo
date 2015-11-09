@@ -29,7 +29,9 @@ public class MusicApp extends Application {
 		super.onCreate();
 		Log.d(TAG, "Application OnCreate");
 		initPath();
-		setDefaultWavFile();
+		setDefaultWavFile(R.raw.test_48k, "/test_48k.wav");
+		setDefaultWavFile(R.raw.test_44_1k, "/test_44_1k.wav");
+		createRecordFile();
 	}
 	
 	private void initPath() {//
@@ -59,13 +61,18 @@ public class MusicApp extends Application {
 		recFileName = new String(musicPath + "/record.wav");
 	}
 	
-    private void setDefaultWavFile(){//在外部目录复制一个wav文件
-    	String path = musicPath + "/0test.wav";
+	/**
+	 * 设置默认的音频文件
+	 * @param rawID 音乐ID编号
+	 * @param fileName wav文件名
+	 */
+    private void setDefaultWavFile(int rawID, String fileName){//在外部目录复制一个wav文件
+    	String path = musicPath + fileName;
     	File file = new File(path); 
         if(file.exists()){
        	 return;
         }
-    	InputStream inputStream = getResources().openRawResource(R.raw.test);
+    	InputStream inputStream = getResources().openRawResource(rawID);
     	 try {
 			byte[] reader = new byte[inputStream.available()];
 			 while (inputStream.read(reader) != -1) {
@@ -95,6 +102,21 @@ public class MusicApp extends Application {
              //将出错信息打印到Logcat  
         	 Log.i(TAG, e.getMessage());  
          } 
+    }
+    
+    private void createRecordFile(){//为了保证第一次进入时有record文件
+    	String path = musicPath + "/record.wav";
+    	File file = new File(path); 
+        if(file.exists()){
+       	 return;
+        }else{
+            try {
+				file.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+        }
     }
 
 }

@@ -271,7 +271,8 @@ public class MainActivity extends Activity {
 			case R.id.btn_record://录音
 				if(mIsConnectDev){
 					play(false, null , true, MusicApp.recFileName);
-					mBtn_play.setVisibility(View.INVISIBLE);
+					mBtn_play.setEnabled(false);
+					mBtn_rec.setEnabled(false);
 					mIsRecStat = true;
 					sendMsgAppendLog("开始录音");
 				}else{
@@ -286,7 +287,8 @@ public class MainActivity extends Activity {
 				if(mIsConnectDev){
 					play(true, MusicApp.mCurrFileName, false, null);
 					sendMsgAppendLog("开始播放");
-					mBtn_rec.setVisibility(View.INVISIBLE);
+					mBtn_rec.setEnabled(false);
+					mBtn_play.setEnabled(false);
 				}else{
 					sendMsgAppendLog("设备未连接");
 				}
@@ -295,14 +297,14 @@ public class MainActivity extends Activity {
 				if(mIsConnectDev){
 					stopClicked();
 					sendMsgAppendLog("停止");
-					mBtn_play.setVisibility(View.VISIBLE);
-					mBtn_rec.setVisibility(View.VISIBLE);
+					mBtn_play.setEnabled(true);;
+					mBtn_rec.setEnabled(true);;
 					if(mIsRecStat){//设置录音文件为默认打开的文件
 						setChooseFile("record");
 					}
 					mIsRecStat = false;
 				}else{
-					sendMsgAppendLog("设备未连接");
+//					sendMsgAppendLog("设备未连接");
 				}
 				break;
 			default:
