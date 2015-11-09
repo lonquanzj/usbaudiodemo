@@ -3,6 +3,7 @@
 #include <wx/string.h>
 #include <semaphore.h>
 #include "PlayControl.h"
+#include "ToJava.h"
 
 class InputMonitorBuffer;
 class USBAudioManager;
@@ -23,10 +24,10 @@ class HIDTransfer;
  * Then, from the USB permission request handler in Java, call initUSBDevice().
  */
 
-
 class USBControl
 {
 public:
+
     USBControl();
     virtual ~USBControl();
 
@@ -98,7 +99,7 @@ public:
      *  Start playback and/or recording from the Android side (mic and earpiece). Sample rates are limited to 48000Hz max and are dependant
      *  on the specific device. In 99.9% of the cases, 44100 and 48000 are available.
      */
-    bool startMusicCtrl(bool i_play,
+    bool startPlayCtrl(bool i_play,
                        bool i_record,
                        int i_actualChannelsRecording,
                        int i_sampleRate,
@@ -110,6 +111,8 @@ public:
     void setValue(int type, int index,float value);
     bool GetPlayStatu();
     bool GetRecStatu();
+
+    void initJavaINfo();
 
 private:
     /**

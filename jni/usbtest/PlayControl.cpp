@@ -100,47 +100,54 @@ int PlayControl::init(int sampleRate, int outChans, int inChans,
 	return CONTROL_SUCCESS;
 }
 
-void PlayControl::handlePlayData(void *pBuffer, int byte_size) { //size : 3840
+int PlayControl::handlePlayData(void *pBuffer, int byte_size) { //size : 3840
 //	writedizeng(pBuffer, byte_size/4);//双声道
-	if(false == m_wavFile->readWavFile(pBuffer, byte_size)){
-		isRunning = 0;
-//		wxLogDebugMain("Play Stop ");
-	}
+	return m_wavFile->readWavFile(pBuffer, byte_size);
 }
 
-void PlayControl::handleRecData(void *pBuffer, int byte_size) { //size : 3840
+int PlayControl::handleRecData(void *pBuffer, int byte_size) { //size : 3840
 //	int *p = (int*) pBuffer;
 //	for (int temp = 0; temp < byte_size; temp++) {//打印前几个数据
-//		if (*(p + temp)) {
+//		if (*(p + temp)) {//仅仅打印非零数据
 //			dayinqianjige(pBuffer);
 //			return 0;
 //		}
 //	}
 //	panduandizeng(pBuffer, byte_size / 4);
-	if(false == m_wavFile->writeWavFile(pBuffer, byte_size)){
-		isRunning = 0;
-	}
+	return m_wavFile->writeWavFile(pBuffer, byte_size);
 }
 
 int PlayControl::nextIndex(int index, int increment) {
 	return (INT_MAX - index >= increment) ? index + increment : 0;
 }
 
+/*
+ * outputBufferFrames    2*960
+ * outputChannels        12*960
+ * callbackBUfferFrames 960
+ */
 void* PlayMethod(void *context) {
 	PlayControl *p = (PlayControl *) context;
-
-	usleep(100);
+	USBControl *pUsbControl = (USBControl*)p->context;
+	int r = -1;
 	while (p->isRunning) {
 //		wxLogDebugMain("PlayMethod");
-		p->handlePlayData(p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels,
+		r = p->handlePlayData(p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels,
 				p->callbackBufferFrames * p->outputChannels * sizeof(short));
+		if (r == 0) { //读到文件末尾
+			wxLogErrorMain("read play : file ending!");
+			pUsbControl->stopUSBTransfers();
+			break;
+		} else if (r == -1) {
+			wxLogErrorMain("read play : file wrong!");
+			pUsbControl->stopUSBTransfers();
+			break;
+		}
 
 		p->callback(p->context, p->sampleRate, p->callbackBufferFrames,p->outputChannels,
 				p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels, 0, NULL);
-
 		p->outputIndex = p->nextIndex(p->outputIndex, p->callbackBufferFrames);
 		sem_wait(&sem);
-//		usleep(20000);
 	}
 	wxLogErrorMain("exit Play thread");
 	return NULL;
@@ -153,7 +160,8 @@ void* PlayMethod(void *context) {
  */
 void* RecordMethod(void *context) {
 	PlayControl *p = (PlayControl *) context;
-	usleep(100);
+	USBControl *pUsbControl = (USBControl*)p->context;
+	int r = -1;
 	while (p->isRunning) {
     	sem_wait(&sem1);
 		short *currentinputBuffer = p->inputBuffer+ (p->inputIndex % p->inputBufferFrames) * p->inputChannels;
@@ -161,7 +169,13 @@ void* RecordMethod(void *context) {
 		//    	wxLogDebugMain("inputBufferFrames=%d inputChannels=%d callbackBUfferFrames=%d", p->inputBufferFrames, p->inputChannels,p->callbackBufferFrames);
 		p->callback(p->context, p->sampleRate, p->callbackBufferFrames, 0, NULL, p->inputChannels,currentinputBuffer);
 
-		p->handleRecData(currentinputBuffer,p->callbackBufferFrames * p->inputChannels * sizeof(short));
+		r = p->handleRecData(currentinputBuffer,p->callbackBufferFrames * p->inputChannels * sizeof(short));
+		if(r == -1){
+			wxLogErrorMain("read play : file wrong!");
+			pUsbControl->stopUSBTransfers();
+			break;
+		}
+
 		p->inputIndex = p->nextIndex(p->inputIndex, p->callbackBufferFrames);
 	}
 	wxLogErrorMain("exit Rec thread");

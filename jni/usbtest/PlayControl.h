@@ -66,8 +66,8 @@ public:
 
 	Myresult openPlayThread ();
 	Myresult openRecThread ();
-	void handlePlayData(void *pBuffer,int size);
-	void handleRecData(void *pBuffer,int size);
+	int handlePlayData(void *pBuffer,int size);
+	int handleRecData(void *pBuffer,int size);
 //	Myresult myClear();
 
 	int nextIndex(int index, int increment);

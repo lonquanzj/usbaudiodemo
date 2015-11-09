@@ -38,8 +38,8 @@ public:
 	void getWavHead();
 	void setWavHead();
 
-	bool readWavFile(void *buffer, int inFramesize);
-	bool writeWavFile(void *buffer, int outFramesize);
+	int readWavFile(void *buffer, int inFramesize);
+	int writeWavFile(void *buffer, int outFramesize);
 
 	int mixWavFile();//合成录音+伴奏
 

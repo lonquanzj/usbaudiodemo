@@ -76,26 +76,17 @@ int WavFile::prepareWriteWavFile(){
 }
 
 
-bool WavFile::writeWavFile(void *buffer, int size){
-
+int WavFile::writeWavFile(void *buffer, int size){
 //	wxLogFuckMain("writeWavFile");
-//	dayinqianjige(buffer);
-	int len;
-	if((len == write(m_handleRecWavFile, buffer, size))  == -1){
-		wxLogFuckMain("Write Rec File Fail!");
-		return false;
-	}
-	return true;
+	return write(m_handleRecWavFile, buffer, size);
 }
 
-bool WavFile::readWavFile(void *buffer, int size){
+/*
+ * read:出错返回-1 到文件末尾返回 0
+ */
+int WavFile::readWavFile(void *buffer, int size){
 //	wxLogFuckMain("readWavFile");
-	int len = 0;
-	if((len == read(m_handlePlayWavFile, buffer, size)) == -1){
-		wxLogFuckMain("Read Music File Fail!");
-		return false;
-	}
-	return true;
+	return read(m_handlePlayWavFile, buffer, size);
 }
 
 void WavFile::closeAllFile(){

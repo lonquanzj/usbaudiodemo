@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
         
 		// 设定默认的文件 确保每次进入都有默认的音乐文件
 		if (mS.size() > 0) {
-			setChooseFile(mS.get(1));
+			setChooseFile(mS.get(0));
 		}
     }
 
@@ -190,11 +190,11 @@ public class MainActivity extends Activity {
             
             if (command == null)
             {
-                Log.v("Main", "null message!");
+                Log.v(MusicApp.TAG, "null message!");
                 return;
             }
             
-            Log.v("Main", command);
+            Log.v(MusicApp.TAG, command);
             
             if (command.contentEquals("USBInitialized") && m_activity != null)
             {
@@ -357,5 +357,9 @@ public class MainActivity extends Activity {
 		bundle.putString("logInfo", data);
 		msg.setData(bundle);
 		mHandler.sendMessage(msg);
+	}
+	
+	public void sendEmptyMessageFromNative(int msgType){
+		mHandler.sendEmptyMessage(msgType);
 	}
 }

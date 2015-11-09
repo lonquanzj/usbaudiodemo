@@ -1,9 +1,12 @@
 package com.ccm.usbaudiodemo;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 import android.app.Application;
 import android.os.Environment;
@@ -26,6 +29,7 @@ public class MusicApp extends Application {
 		super.onCreate();
 		Log.d(TAG, "Application OnCreate");
 		initPath();
+		setDefaultWavFile();
 	}
 	
 	private void initPath() {//
@@ -54,4 +58,43 @@ public class MusicApp extends Application {
 		logFileName = new String(rootPath + "/USBTester.txt");
 		recFileName = new String(musicPath + "/record.wav");
 	}
+	
+    private void setDefaultWavFile(){//在外部目录复制一个wav文件
+    	String path = musicPath + "/0test.wav";
+    	File file = new File(path); 
+        if(file.exists()){
+       	 return;
+        }
+    	InputStream inputStream = getResources().openRawResource(R.raw.test);
+    	 try {
+			byte[] reader = new byte[inputStream.available()];
+			 while (inputStream.read(reader) != -1) {
+				 writefile(reader,path); 
+			 }   
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			 Log.i(TAG, e.getMessage());   
+		} 
+    }
+    
+    private void writefile(byte[]str, String path){
+    	File file; 
+        FileOutputStream out; 
+         try { 
+             //创建文件  
+             file = new File(path); 
+             file.createNewFile(); 
+             //打开文件file的OutputStream  
+             out = new FileOutputStream(file); 
+              
+             //将字符串转换成byte数组写入文件  
+             out.write(str); 
+             //关闭文件file的OutputStream  
+             out.close();  
+         } catch (IOException e) { 
+             //将出错信息打印到Logcat  
+        	 Log.i(TAG, e.getMessage());  
+         } 
+    }
+
 }

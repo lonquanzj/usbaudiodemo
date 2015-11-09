@@ -48,6 +48,12 @@ USBAudioManager *USBControl::getUSBAudioManager() const
 }
 
 
+
+void USBControl::initJavaINfo()//为了向MainActivity发送消息 初始化接受消息的activity
+{
+	setPackageName("com/ccm/usbaudiodemo/activity/MainActivity");
+}
+
 bool USBControl::initUSB()
 {
 	if (m_USBAudioManager == NULL)
@@ -57,6 +63,8 @@ bool USBControl::initUSB()
 		m_USBAudioManager = new USBAudioManager("");
         return m_USBAudioManager->init();
     }
+
+//	initJavaINfo();
 
     return true;
 }
@@ -380,7 +388,7 @@ bool USBControl::startUSBTransfers(bool i_playAudio,
 		m_tempBuffer = new short[i_bufferSizeInFrames * 2];
 
 		wxLogDebugMain("Starting PlayContrl");
-		if (startMusicCtrl(i_playAudio, i_recordAudio , 2, i_sampleRate, i_openSLESBufferSizeInFrames)) {
+		if (startPlayCtrl(i_playAudio, i_recordAudio , 2, i_sampleRate, i_openSLESBufferSizeInFrames)) {
 			if (i_playAudio) {
 				m_playing = true;
 			}
@@ -445,6 +453,10 @@ void USBControl::stopUSBTransfers()
     }
 }
 
+void USBControl::stopPlayCtrol(){
+	 m_playControl->stop();
+}
+
 
 void USBControl::setUSBSampleRate(int i_sampleRate)
 {
@@ -488,7 +500,7 @@ void USBControl::playCtrlCallback(void *context, int sample_rate, int buffer_fra
 }
 
 
-bool USBControl::startMusicCtrl(bool i_play,
+bool USBControl::startPlayCtrl(bool i_play,
                                bool i_record,
                                int i_actualChannelsRecording,
                                int i_sampleRate,
@@ -527,10 +539,6 @@ bool USBControl::startMusicCtrl(bool i_play,
 }
 
 
-void USBControl::stopPlayCtrol()
-{
-    m_playControl->stop();
-}
 
 void USBControl::sendMsgByHid(){
 //	m_HIDTransfer->sendMsg(p,len);
