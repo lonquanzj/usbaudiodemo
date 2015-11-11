@@ -283,6 +283,8 @@ bool USBControl::recordCallback(const void *i_input,
             {
                 usbControl->m_bufferFromUSBToHost->copyToBuffer((short *) i_input, i_frameCount);
 //                dayinqianjige(i_input);
+//                panduandizeng(i_input, i_frameCount);
+//                jiangeshijian();
             	if (++g_data_rec % 10 == 0)  sem_post(&sem1);
 
             }
@@ -484,7 +486,7 @@ void USBControl::playCtrlCallback(void *context, int sample_rate, int buffer_fra
     if (output_channels > 0 && output_buffer)
     {
 //        wxLogDebugMain("PUT! %d frames", buffer_frames);
-          usbControl->m_bufferFromHostToUSB->copyToBuffer(output_buffer, buffer_frames);
+    	usbControl->m_bufferFromHostToUSB->copyToBuffer(output_buffer, buffer_frames);
     }
 
     // then Rec part
@@ -494,7 +496,7 @@ void USBControl::playCtrlCallback(void *context, int sample_rate, int buffer_fra
 //        wxLogDebugMain("INPUT PLAYCONTROL!getFramesWritten= %d buffer_frames=%d",usbControl->m_bufferFromUSBToHost->getFramesWritten(), buffer_frames);
         if (usbControl->m_bufferFromUSBToHost->getFramesWritten() >= buffer_frames)
         {
-            usbControl->m_bufferFromUSBToHost->copyFromBuffer(input_buffer, buffer_frames);
+        	usbControl->m_bufferFromUSBToHost->copyFromBuffer(input_buffer, buffer_frames);
         }
     }
 }
@@ -556,47 +558,12 @@ void SetMainSampleRate(int Rate)
 {
 }
 
-
-bool DelayCopyFlag=0;
-int DelayCounter=0;
-int USBControl::checkWriteReadPosition()
-{
-   int ret;
-   int write_ptr,read_ptr;
-   write_ptr=m_bufferFromHostToUSB->getWritePosition();
-   read_ptr=m_bufferFromHostToUSB->getReadPosition();
-   if(write_ptr>=read_ptr)
-   {
-	   if((write_ptr + 960 < m_bufferFromHostToUSB->getBufferFrameSize())&&(DelayCopyFlag==0))
-	   {
-		  DelayCounter=0;
-          ret=COPY_EN;
-	   }
-	   else{
-		   if(DelayCounter++<40)
-		   {
-			   DelayCopyFlag=1;
-			   ret=COPY_NO;
-
-		   }else{
-			   DelayCopyFlag=0;
-			   ret=COPY_EN;
-		   }
-	   }
-
-   }else if((write_ptr<read_ptr)&&(read_ptr-write_ptr>96*4)){
-	  ret=COPY_EN;
-   }else{
-	  ret=COPY_NO;
-   }
-   return ret;
-
+bool USBControl::CheckPlayInputMonitorBuffer(int buffer_frames){
+	return m_bufferFromHostToUSB->checkCopyToBuffer(buffer_frames);
 }
 
-bool USBControl::GetPlayStatu(){
-	return m_playing;
+bool USBControl::CheckRecInputMonitorBuffer(int buffer_frames){
+	return m_bufferFromUSBToHost->checkCopyFromBuffer(buffer_frames);
 }
 
-bool USBControl::GetRecStatu(){
-	return m_recording;
-}
+

@@ -2,6 +2,11 @@
 
 #include <wx/string.h>
 
+
+#define COPY_EN 0
+#define COPY_NO 1
+#define DELAY   2
+
 class InputMonitorBuffer
 {
 public:
@@ -12,17 +17,17 @@ public:
     void checkMemoryBarrierHit(const wxString& i_extraMessage) const;
 
     void copyToBuffer(short *i_data, int i_bufferSizeFrames);
+    void copyFromBuffer(short *o_destDataPtr, int i_bufferSizeFrames);
     int getFramesWritten() const;
 
-    void copyFromBuffer(short *o_destDataPtr, int i_bufferSizeFrames);
 
     // silences the buffer by writing 0's in it.
     void clearBuffer();
-    int getWritePosition();
-    int getReadPosition();
-    int getBufferFrameSize();
 
-    bool CheckLatency(int i_bufferSizeFrames);
+    bool checkCopyToBuffer(int i_bufferSizeFrames);
+    bool checkCopyFromBuffer(int i_bufferSizeFrames);
+
+//    int checkWriteReadPosition(int i_bufferSizeFrames);
 private:
     short *m_data;
     int m_bufferSizeFrames;

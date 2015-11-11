@@ -114,7 +114,9 @@ int PlayControl::handleRecData(void *pBuffer, int byte_size) { //size : 3840
 //		}
 //	}
 //	panduandizeng(pBuffer, byte_size / 4);
+//	jiangeshijian();
 	return m_wavFile->writeWavFile(pBuffer, byte_size);
+	return 0;
 }
 
 int PlayControl::nextIndex(int index, int increment) {
@@ -125,28 +127,42 @@ int PlayControl::nextIndex(int index, int increment) {
  * outputBufferFrames    2*960
  * outputChannels        12*960
  * callbackBUfferFrames 960
+ * 在copyToBuffer中  无论读写位置是什么  始终会将数据写入   所以写位置会改变
+ * 但是在读的位置将要覆盖写位置的情况下  要等待读位置像前走再写入  因此 写的位置是不能被改变的
+ * 因此在这里必须将callback放到if里面  否则会出现重复播放同一buffer的现象
  */
 void* PlayMethod(void *context) {
 	PlayControl *p = (PlayControl *) context;
-	USBControl *pUsbControl = (USBControl*)p->context;
+	USBControl *pUsbControl = (USBControl*)(p->context);
 	int r = -1;
+	bool flag = true;
+
+	r = p->handlePlayData(p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels,
+			p->callbackBufferFrames * p->outputChannels * sizeof(short));//先从问你安读一段到buffer
+
 	while (p->isRunning) {
 //		wxLogDebugMain("PlayMethod");
-		r = p->handlePlayData(p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels,
-				p->callbackBufferFrames * p->outputChannels * sizeof(short));
-		if (r == 0) { //读到文件末尾
-			wxLogErrorMain("read play : file ending!");
-			pUsbControl->stopUSBTransfers();
-			break;
-		} else if (r == -1) {
-			wxLogErrorMain("read play : file wrong!");
-			pUsbControl->stopUSBTransfers();
-			break;
+
+		if(pUsbControl->CheckPlayInputMonitorBuffer(p->callbackBufferFrames)){//写+callbackframe>读 不处理
+
+			p->callback(p->context, p->sampleRate, p->callbackBufferFrames,p->outputChannels,
+				p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels, 0, NULL);
+
+			p->outputIndex = p->nextIndex(p->outputIndex, p->callbackBufferFrames);
+			r = p->handlePlayData(p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels,
+					p->callbackBufferFrames * p->outputChannels * sizeof(short));
+
+			if (r == 0) { //读到文件末尾
+				wxLogErrorMain("read play : file ending!");
+				pUsbControl->stopUSBTransfers();
+				break;
+			} else if (r == -1) {
+				wxLogErrorMain("read play : file wrong!");
+				pUsbControl->stopUSBTransfers();
+				break;
+			}
 		}
 
-		p->callback(p->context, p->sampleRate, p->callbackBufferFrames,p->outputChannels,
-				p->outputBuffer+ (p->outputIndex % p->outputBufferFrames)* p->outputChannels, 0, NULL);
-		p->outputIndex = p->nextIndex(p->outputIndex, p->callbackBufferFrames);
 		sem_wait(&sem);
 	}
 	wxLogErrorMain("exit Play thread");
@@ -154,29 +170,35 @@ void* PlayMethod(void *context) {
 }
 
 /*
- * inputBufferFrames    2*960
+ * inputBufferFrames    2*callbackBUfferFrames
  * inputChannels        2
- * callbackBUfferFrames 960
+ * callbackBUfferFrames 960+-X
+ * 在copyFromBuffer中  如果读不到数据  就会返回  因此 读位置不会改变
+ * 因此在这里必须将callback放到if里面  否则会出现重复播放同一buffer的现象
  */
 void* RecordMethod(void *context) {
 	PlayControl *p = (PlayControl *) context;
-	USBControl *pUsbControl = (USBControl*)p->context;
+	USBControl *pUsbControl = (USBControl*)(p->context);
 	int r = -1;
 	while (p->isRunning) {
     	sem_wait(&sem1);
-		short *currentinputBuffer = p->inputBuffer+ (p->inputIndex % p->inputBufferFrames) * p->inputChannels;
-		memset(currentinputBuffer, 0,p->callbackBufferFrames * p->inputChannels * sizeof(short));
-		//    	wxLogDebugMain("inputBufferFrames=%d inputChannels=%d callbackBUfferFrames=%d", p->inputBufferFrames, p->inputChannels,p->callbackBufferFrames);
-		p->callback(p->context, p->sampleRate, p->callbackBufferFrames, 0, NULL, p->inputChannels,currentinputBuffer);
+		if(pUsbControl->CheckRecInputMonitorBuffer(p->callbackBufferFrames)){//如果是有效数据才进行处理  读+callbackframe>写 不处理
 
-		r = p->handleRecData(currentinputBuffer,p->callbackBufferFrames * p->inputChannels * sizeof(short));
-		if(r == -1){
-			wxLogErrorMain("read play : file wrong!");
-			pUsbControl->stopUSBTransfers();
-			break;
+			short *currentinputBuffer = p->inputBuffer+ (p->inputIndex % p->inputBufferFrames) * p->inputChannels;
+			memset(currentinputBuffer, 0,p->callbackBufferFrames * p->inputChannels * sizeof(short));
+
+	//    	wxLogDebugMain("inputBufferFrames=%d inputChannels=%d callbackBUfferFrames=%d", p->inputBufferFrames, p->inputChannels,p->callbackBufferFrames);
+			p->callback(p->context, p->sampleRate, p->callbackBufferFrames, 0, NULL, p->inputChannels,currentinputBuffer);
+
+			r = p->handleRecData(currentinputBuffer,p->callbackBufferFrames * p->inputChannels * sizeof(short));
+			if(r == -1){
+				wxLogErrorMain("read play : file wrong!");
+				pUsbControl->stopUSBTransfers();
+				break;
+			}
+
+			p->inputIndex = p->nextIndex(p->inputIndex, p->callbackBufferFrames);
 		}
-
-		p->inputIndex = p->nextIndex(p->inputIndex, p->callbackBufferFrames);
 	}
 	wxLogErrorMain("exit Rec thread");
 	return NULL;
@@ -309,3 +331,5 @@ void PlayControl::openRecFile(const char* wavFileName){
 	m_wavFile->setWriteWavFileName(wavFileName);
 	m_wavFile->prepareWriteWavFile();
 }
+
+

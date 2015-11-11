@@ -29,8 +29,8 @@ public class MusicApp extends Application {
 		super.onCreate();
 		Log.d(TAG, "Application OnCreate");
 		initPath();
-		setDefaultWavFile(R.raw.test_48k, "/test_48k.wav");
-		setDefaultWavFile(R.raw.test_44_1k, "/test_44_1k.wav");
+//		setDefaultWavFile(R.raw.test_48k, "/test_48k.wav");
+//		setDefaultWavFile(R.raw.test_44_1k, "/test_44_1k.wav");
 		createRecordFile();
 	}
 	

@@ -54,7 +54,8 @@ void panduandizeng(const void* i_input, int i_frameCount){
               s2 = *(temp+1);
                if(1 != (s2 - s1)){
             	   	 if((s2- s1) > 1)
-                     wxLogDebugMain( "front %d, rear %d", s1, s2);
+//                     wxLogDebugMain( "front %d, rear %d", s1, s2);
+            	   		 dayinqianjige(temp);
                      count++;
               }
        }
@@ -67,7 +68,10 @@ void panduandizeng(const void* i_input, int i_frameCount){
  * 打印给定buffer的双声道音频数据
  */
 void dayinqianjige(const void* i_input){
-	wxLogDebugMain( "%x, %x, %x， %x", *(short*)i_input, *(short*)((int*)i_input + 1), *(short*)((int*)i_input + 2),*(short*)((int*)i_input + 3));
+	wxLogDebugMain( "1 %x, %x, %x， %x", *(short*)i_input, *(short*)((short*)i_input + 1), *(short*)((short*)i_input + 2),*(short*)((short*)i_input + 3));
+	wxLogDebugMain( "2 %x, %x, %x， %x", *(short*)((short*)i_input + 4), *(short*)((short*)i_input + 5), *(short*)((short*)i_input + 6),*(short*)((short*)i_input + 7));
+	wxLogDebugMain( "3 %x, %x, %x， %x", *(short*)((short*)i_input + 8), *(short*)((short*)i_input + 9), *(short*)((short*)i_input + 10),*(short*)((short*)i_input + 11));
+	wxLogDebugMain( "4 %x, %x, %x， %x", *(short*)((short*)i_input + 12), *(short*)((short*)i_input + 13), *(short*)((short*)i_input + 14),*(short*)((short*)i_input + 15));
 }
 
 /*

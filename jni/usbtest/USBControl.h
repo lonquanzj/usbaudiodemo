@@ -10,9 +10,6 @@ class USBAudioManager;
 class USBAudioStreamConfig;
 class HIDTransfer;
 
-#define COPY_EN 0
-#define COPY_NO 1
-#define DELAY   2
 
 /**
  * EXAMPLE implementation to call the USB audio driver. You will need to make your own
@@ -109,8 +106,10 @@ public:
 
     void sendMsgByHid();
     void setValue(int type, int index,float value);
-    bool GetPlayStatu();
-    bool GetRecStatu();
+    bool CheckPlayInputMonitorBuffer(int buffer_frames);
+    bool CheckRecInputMonitorBuffer(int buffer_frames);
+//    bool GetPlayStatu();
+//    bool GetRecStatu();
 
     void initJavaINfo();
 
@@ -172,8 +171,6 @@ private:
 
     // for 16- to 32-bit conversion
     short *m_tempBuffer;
-
-    int checkWriteReadPosition();
 
     HIDTransfer *m_HIDTransfer;
 };

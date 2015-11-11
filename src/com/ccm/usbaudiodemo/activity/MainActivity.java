@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 	
 	public static final int UPDATE_LOG = 1;
 	
-    final static int s_defaultOpenSLESBufferSizeInFrames = 960;
+    final static int s_defaultOpenSLESBufferSizeInFrames = 968;
     final static int s_defaultUSBBufferSizeInFrames = 4096;
     final static int s_defaultSampleRate = 48000;
 	
